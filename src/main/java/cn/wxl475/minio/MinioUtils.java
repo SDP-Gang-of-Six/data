@@ -17,8 +17,6 @@ public class MinioUtils {
 
     @Autowired
     private MinioClient client;
-    @Autowired
-    private MinioProp minioProp;
 
     /**
      * 创建存储桶
