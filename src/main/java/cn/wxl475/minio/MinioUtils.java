@@ -17,6 +17,8 @@ public class MinioUtils {
 
     @Autowired
     private MinioClient client;
+    @Autowired
+    private MinioProp minioProp;
 
     /**
      * 创建存储桶
@@ -64,27 +66,8 @@ public class MinioUtils {
             log.error("上传文件失败",e);
             return "上传文件失败";
         }
-        log.info("文件上传成功" + objectWriteResponse.bucket() + objectWriteResponse.object());
-        return getPresignedObjectUrl(path,bucketName);
+        log.info("文件上传成功" + minioProp.getEndpoint()+"/"+objectWriteResponse.bucket()+"/"+objectWriteResponse.object());
+        return minioProp.getEndpoint()+"/"+objectWriteResponse.bucket()+"/"+objectWriteResponse.object();
     }
 
-    /**
-     * 删除文件
-     *
-     * @param objectName 文件名
-     * @param bucketName 存储桶
-     */
-    public String getPresignedObjectUrl(String objectName, String bucketName){
-        try {
-            return client.getPresignedObjectUrl(GetPresignedObjectUrlArgs.builder().
-                    bucket(bucketName).
-                    object(objectName).
-                    expiry(30000, TimeUnit.DAYS).
-                    method(Method.PUT).
-                    build());
-        }catch (Exception e){
-            log.error("获取文件URL失败",e);
-            return "获取文件URL失败";
-        }
-    }
 }

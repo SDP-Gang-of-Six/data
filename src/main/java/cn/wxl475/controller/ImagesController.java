@@ -63,7 +63,7 @@ public class ImagesController {
                         null,
                         null,
                         0);
-                if(!("上传文件为空".equals(url) || "上传文件失败".equals(url) || "获取文件URL失败".equals(url))){
+                if(!("上传文件为空".equals(url) || "上传文件失败".equals(url))){
                     image1 = imagesService.insertImage(image1);
                 }
                 return image1;
