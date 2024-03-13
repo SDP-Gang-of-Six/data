@@ -43,7 +43,7 @@ public class ImagesController {
         Claims claims = JwtUtils.parseJWT(Authorization, signKey);
         if (claims == null) {
             return Result.error("token无效");
-        }else if(claims.get("userType")!= userType.ADMIN){
+        }else if(claims.get("userType")!=Integer.valueOf(userType.ADMIN.ordinal())){
             return Result.error("权限不足");
         }else if(images == null || images.isEmpty()){
             return Result.error("上传文件为空");
