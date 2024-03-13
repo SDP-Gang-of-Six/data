@@ -1,0 +1,97 @@
+package cn.wxl475.minio;
+
+import cn.wxl475.pojo.FileType;
+import io.minio.*;
+import io.minio.errors.*;
+import io.minio.http.Method;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.util.concurrent.TimeUnit;
+
+
+@Slf4j
+@Component
+public class MinioUtils {
+
+    @Autowired
+    private MinioClient client;
+    @Autowired
+    private MinioProp minioProp;
+
+    /**
+     * 创建存储桶
+     *
+     * @param bucketName 存储桶名称
+     */
+    @SneakyThrows
+    public void createBucket(String bucketName) {
+        BucketExistsArgs bucketExistsArgs = BucketExistsArgs.builder().bucket(bucketName).build();
+        if (!client.bucketExists(bucketExistsArgs)) {
+            MakeBucketArgs makeBucketArgs = MakeBucketArgs.builder().bucket(bucketName).build();
+            client.makeBucket(makeBucketArgs);
+        }
+    }
+
+    /**
+     * 上传文件
+     *
+     * @param file       文件
+     * @param path       文件路径
+     * @param bucketName 存储桶
+     */
+    public String uploadFile(MultipartFile file, String path, String bucketName) {
+        // 判断上传文件是否为空
+        if (file == null || file.isEmpty()) {
+            return "上传文件为空";
+        }
+
+        String originalFilename = file.getOriginalFilename();
+        assert originalFilename != null;
+        // 新的文件名 = 时间戳+文件名
+        String fileName = System.currentTimeMillis() + "_" + originalFilename;
+        path = path + fileName;
+
+        // 开始上传
+        ObjectWriteResponse objectWriteResponse;
+        try {
+            objectWriteResponse = client.putObject(PutObjectArgs.builder().
+                    contentType(file.getContentType()).
+                    bucket(bucketName).
+                    stream(file.getInputStream(), file.getSize(), -1).
+                    object(path).
+                    build());
+        }catch (Exception e){
+            log.error("上传文件失败",e);
+            return "上传文件失败";
+        }
+        log.info("文件上传成功" + objectWriteResponse.bucket() + objectWriteResponse.object());
+        return getPresignedObjectUrl(path,bucketName);
+    }
+
+    /**
+     * 删除文件
+     *
+     * @param objectName 文件名
+     * @param bucketName 存储桶
+     */
+    public String getPresignedObjectUrl(String objectName, String bucketName){
+        try {
+            return client.getPresignedObjectUrl(GetPresignedObjectUrlArgs.builder().
+                    bucket(bucketName).
+                    object(objectName).
+                    expiry(30000, TimeUnit.DAYS).
+                    method(Method.PUT).
+                    build());
+        }catch (Exception e){
+            log.error("获取文件URL失败",e);
+            return "获取文件URL失败";
+        }
+    }
+}
