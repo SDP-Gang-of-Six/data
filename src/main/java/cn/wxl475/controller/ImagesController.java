@@ -4,6 +4,7 @@ import cn.hutool.core.thread.ThreadUtil;
 import cn.wxl475.minio.MinioUtils;
 import cn.wxl475.pojo.Image;
 import cn.wxl475.pojo.Result;
+import cn.wxl475.pojo.userType;
 import cn.wxl475.service.ImagesService;
 import cn.wxl475.utils.JwtUtils;
 import io.jsonwebtoken.Claims;
@@ -42,7 +43,7 @@ public class ImagesController {
         Claims claims = JwtUtils.parseJWT(Authorization, signKey);
         if (claims == null) {
             return Result.error("token无效");
-        }else if(!"admin".equals(claims.get("userType"))){
+        }else if(claims.get("userType")!= userType.ADMIN){
             return Result.error("权限不足");
         }else if(images == null || images.isEmpty()){
             return Result.error("上传文件为空");
@@ -54,7 +55,7 @@ public class ImagesController {
             futures.add(completionService.submit(() -> {
                 String url = minioUtils.uploadFile(image, "images/", "pet-hospital");
                 Image image1 = new Image(
-                        (Long) null,
+                        null,
                         (Long) claims.get("userId"),
                         url,
                         image.getOriginalFilename(),
