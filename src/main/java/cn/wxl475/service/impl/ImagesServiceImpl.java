@@ -5,8 +5,10 @@ import cn.wxl475.mapper.ImagesMapper;
 import cn.wxl475.minio.MinioUtils;
 import cn.wxl475.pojo.Image;
 import cn.wxl475.service.ImagesService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
@@ -15,6 +17,7 @@ import java.util.Objects;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.Future;
 
+@Slf4j
 @Service
 public class ImagesServiceImpl implements ImagesService {
 
@@ -31,6 +34,7 @@ public class ImagesServiceImpl implements ImagesService {
      * @return
      */
     @Override
+    @Transactional
     public ArrayList<Image> uploadImages(ArrayList<MultipartFile> images, Long userId) {
         // 上传文件
         CompletionService<Image> completionService = ThreadUtil.newCompletionService();
@@ -38,7 +42,7 @@ public class ImagesServiceImpl implements ImagesService {
         for(MultipartFile image : images){
             futures.add(completionService.submit(() -> {
                 String url = minioUtils.uploadFile(image, "images/", "pet-hospital");
-                Image image1 = new Image(
+                return new Image(
                         null,
                         userId,
                         url,
@@ -48,19 +52,21 @@ public class ImagesServiceImpl implements ImagesService {
                         LocalDateTime.now(),
                         LocalDateTime.now(),
                         0);
-                if(!("上传文件为空".equals(url) || "上传文件失败".equals(url))){
-                    imagesMapper.insert(image1);
-                }
-                return image1;
             }));
         }
         ArrayList<Image> imageList = new ArrayList<>();
         for(Future<Image> future : futures){
+            Image image = new Image();
             try {
-                imageList.add(future.get());
+                image = future.get();
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error("线程结果获取失败", e);
             }
+            String url = image.getImageUrl();
+            if(!("上传文件为空".equals(url) || "上传文件失败".equals(url))){
+                imagesMapper.insert(image);
+            }
+            imageList.add(image);
         }
         return imageList;
     }
