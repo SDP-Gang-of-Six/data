@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.concurrent.CompletionService;
@@ -44,8 +45,8 @@ public class ImagesServiceImpl implements ImagesService {
                         image.getOriginalFilename(),
                         Objects.requireNonNull(image.getOriginalFilename()).substring(image.getOriginalFilename().lastIndexOf(".") + 1),
                         image.getSize(),
-                        null,
-                        null,
+                        LocalDateTime.now(),
+                        LocalDateTime.now(),
                         0);
                 if(!("上传文件为空".equals(url) || "上传文件失败".equals(url))){
                     imagesMapper.insert(image1);
