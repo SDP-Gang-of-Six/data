@@ -23,6 +23,12 @@ public class ImagesServiceImpl implements ImagesService {
     @Autowired
     private MinioUtils minioUtils;
 
+    /**
+     * 上传图片
+     * @param images
+     * @param userId
+     * @return
+     */
     @Override
     public ArrayList<Image> uploadImages(ArrayList<MultipartFile> images, Long userId) {
         // 上传文件
