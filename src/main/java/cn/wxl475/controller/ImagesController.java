@@ -1,10 +1,7 @@
 package cn.wxl475.controller;
 
-import cn.hutool.core.thread.ThreadUtil;
-import cn.wxl475.minio.MinioUtils;
-import cn.wxl475.pojo.Image;
 import cn.wxl475.pojo.Result;
-import cn.wxl475.pojo.userType;
+import cn.wxl475.pojo.enums.userType;
 import cn.wxl475.service.ImagesService;
 import cn.wxl475.utils.JwtUtils;
 import io.jsonwebtoken.Claims;
@@ -14,9 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
-import java.util.Objects;
-import java.util.concurrent.CompletionService;
-import java.util.concurrent.Future;
 
 @RestController
 @RequestMapping("/data")
