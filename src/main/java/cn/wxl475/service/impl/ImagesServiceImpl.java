@@ -5,7 +5,6 @@ import cn.wxl475.mapper.ImagesMapper;
 import cn.wxl475.minio.MinioUtils;
 import cn.wxl475.pojo.Image;
 import cn.wxl475.service.ImagesService;
-import com.baomidou.dynamic.datasource.annotation.DS;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,7 +31,6 @@ public class ImagesServiceImpl implements ImagesService {
      * @return
      */
     @Override
-    @DS("slave")
     public ArrayList<Image> uploadImages(ArrayList<MultipartFile> images, Long userId) {
         // 上传文件
         CompletionService<Image> completionService = ThreadUtil.newCompletionService();
