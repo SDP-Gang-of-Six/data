@@ -26,9 +26,6 @@ public class ImagesController {
     private String signKey;
 
     @Autowired
-    private MinioUtils minioUtils;
-
-    @Autowired
     private ImagesService imagesService;
 
     /**
@@ -48,36 +45,6 @@ public class ImagesController {
         }else if(images == null || images.isEmpty()){
             return Result.error("上传文件为空");
         }
-        // 上传文件
-        CompletionService<Image> completionService = ThreadUtil.newCompletionService();
-        ArrayList<Future<Image>> futures = new ArrayList<>();
-        for(MultipartFile image : images){
-            futures.add(completionService.submit(() -> {
-                String url = minioUtils.uploadFile(image, "images/", "pet-hospital");
-                Image image1 = new Image(
-                        null,
-                        (Long) claims.get("userId"),
-                        url,
-                        image.getOriginalFilename(),
-                        Objects.requireNonNull(image.getOriginalFilename()).substring(image.getOriginalFilename().lastIndexOf(".") + 1),
-                        image.getSize(),
-                        null,
-                        null,
-                        0);
-                if(!("上传文件为空".equals(url) || "上传文件失败".equals(url))){
-                    image1 = imagesService.insertImage(image1);
-                }
-                return image1;
-            }));
-        }
-        ArrayList<Image> imageList = new ArrayList<>();
-        for(Future<Image> future : futures){
-            try {
-                imageList.add(future.get());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        return Result.success(imageList);
+        return Result.success(imagesService.uploadImages(images, (Long) claims.get("userId")));
     }
 }
