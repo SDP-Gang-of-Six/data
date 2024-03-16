@@ -71,4 +71,9 @@ public class ImagesServiceImpl implements ImagesService {
         }
         return imageList;
     }
+
+    @Override
+    public Object deleteImages(ArrayList<String> imageIds) {
+        return null;
+    }
 }
