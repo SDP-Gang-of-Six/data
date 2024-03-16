@@ -13,4 +13,6 @@ public interface ImagesService {
      * @return
      */
     ArrayList<Image> uploadImages(ArrayList<MultipartFile> images, Long userId);
+
+    ArrayList<String> deleteImages(ArrayList<String> imageIds);
 }

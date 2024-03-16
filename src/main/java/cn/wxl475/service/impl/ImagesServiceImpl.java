@@ -4,6 +4,7 @@ import cn.hutool.core.thread.ThreadUtil;
 import cn.wxl475.mapper.ImagesMapper;
 import cn.wxl475.minio.MinioUtils;
 import cn.wxl475.pojo.Image;
+import cn.wxl475.redis.CacheClient;
 import cn.wxl475.service.ImagesService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +52,7 @@ public class ImagesServiceImpl implements ImagesService {
                         image.getSize(),
                         LocalDateTime.now(),
                         LocalDateTime.now(),
-                        0);
+                        false);
             }));
         }
         ArrayList<Image> imageList = new ArrayList<>();
@@ -69,5 +70,17 @@ public class ImagesServiceImpl implements ImagesService {
             imageList.add(image);
         }
         return imageList;
+    }
+
+    @Override
+    public ArrayList<String> deleteImages(ArrayList<String> imageIds) {
+        imageIds.forEach(imageId -> {
+            Image image = imagesMapper.selectById(imageId);
+            if(image != null){
+                minioUtils.deleteFile(image.getImageUrl());
+                imagesMapper.deleteById(imageId);
+            }
+        }
+        return null;
     }
 }
