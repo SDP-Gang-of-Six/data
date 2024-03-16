@@ -71,16 +71,4 @@ public class ImagesServiceImpl implements ImagesService {
         }
         return imageList;
     }
-
-    @Override
-    public ArrayList<String> deleteImages(ArrayList<String> imageIds) {
-        imageIds.forEach(imageId -> {
-            Image image = imagesMapper.selectById(imageId);
-            if(image != null){
-                minioUtils.deleteFile(image.getImageUrl());
-                imagesMapper.deleteById(imageId);
-            }
-        }
-        return null;
-    }
 }
