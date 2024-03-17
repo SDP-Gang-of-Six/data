@@ -16,6 +16,8 @@ env:
   TARGET_MODULE: data
   # 拉取其他仓库代码的token
   ADMIN_GITHUB_TOKEN: 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
+  # 服务器root密码
+  ROOT_PASSWORD: Wxl5211314.0.
 
 jobs:
   build:
@@ -138,8 +140,4 @@ jobs:
         labels: ${{ steps.meta.outputs.labels }}
 
     - name: Run command via SSH
-      run: |
-        mkdir -p ~/.ssh/
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
-        ssh -o StrictHostKeyChecking=no root@wxl475.cn "sh /root/pet-hospital/${{ env.TARGET_MODULE }}.sh"
+      run: ssh -o StrictHostKeyChecking=no root@wxl475.cn -p ${{ env.ROOT_PASSWORD }} "sh /root/pet-hospital/${{ env.TARGET_MODULE }}.sh"
