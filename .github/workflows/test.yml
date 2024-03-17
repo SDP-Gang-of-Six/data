@@ -16,6 +16,12 @@ jobs:
         java-version: 11
         distribution: 'adopt'
 
+    - name: Checkout allParent
+      uses: actions/checkout@v2
+      with:
+        repository: SDP-Gang-of-Six/allParent
+        path: allParent
+
     - name: Build with Maven
       run: mvn clean install
 
