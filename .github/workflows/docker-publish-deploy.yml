@@ -26,7 +26,7 @@ jobs:
       uses: actions/setup-java@v2
       with:
         java-version: 11
-        distribution: 'adoptium'
+        distribution: 'temurin'
         java-package: jdk
         cache: 'jdk'
 
