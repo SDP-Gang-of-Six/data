@@ -19,7 +19,7 @@ jobs:
     - name: Checkout allParent
       uses: actions/checkout@v2
       with:
-        repository: SDP-Gang-of-Six/allParent
+        repository: SDP-Gang-of-Six/allParent.git
         path: allParent
         token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -29,7 +29,7 @@ jobs:
     - name: Checkout utils
       uses: actions/checkout@v2
       with:
-        repository: SDP-Gang-of-Six/utils
+        repository: SDP-Gang-of-Six/utils.git
         path: utils
         token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -40,7 +40,7 @@ jobs:
     - name: Checkout feign
       uses: actions/checkout@v2
       with:
-        repository: SDP-Gang-of-Six/feign
+        repository: SDP-Gang-of-Six/feign.git
         path: feign
         token: ${{ secrets.GITHUB_TOKEN }}
 
