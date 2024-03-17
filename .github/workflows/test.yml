@@ -1,6 +1,24 @@
 name: Build and Deploy
-#1
+
 on: push
+
+env:
+  # dockerhub账户
+  DOCKERHUB_REGISTRY: docker.io
+  DOCKERHUB_USERNAME: 1715142548
+  DOCKERHUB_PASSWORD: wxl5211314
+  DOCKERHUB_NAMESPACE: 1715142548
+  DOCKERHUB_REPOSITORY: pet-hospital
+  # 组织名
+  ORG: SDP-Gang-of-Six
+  # 所有模块
+  MODULES: allParent,data,base,gateway,illness,user,exam,utils,feign
+  # 父模块
+  PARENT_MODULE: allParent
+  # 要构建的模块
+  TARGET_MODULE: data
+  # 拉取其他仓库代码的token
+  ADMIN_GITHUB_TOKEN: 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
 
 jobs:
   build:
@@ -13,77 +31,77 @@ jobs:
         java-version: 11
         distribution: 'adopt'
 
-    - name: Checkout allParent
+    - name: Checkout ${{ env.MODULES[0] }}
       uses: actions/checkout@v2
       with:
-        repository: SDP-Gang-of-Six/allParent
-        path: allParent
+        repository: ${{ env.ORG }}/${{ env.MODULES[0] }}
+        path: ${{ env.MODULES[0] }}
         ref: main
-        token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
+        token: ${{ env.ADMIN_GITHUB_TOKEN }}
 
-    - name: Checkout data
+    - name: Checkout ${{ env.MODULES[1] }}
       uses: actions/checkout@v2
       with:
-        repository: SDP-Gang-of-Six/data
-        path: data
+        repository: ${{ env.ORG }}/${{ env.MODULES[1] }}
+        path: ${{ env.MODULES[1] }}
         ref: main
-        token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
+        token: ${{ env.ADMIN_GITHUB_TOKEN }}
 
-    - name: Checkout base
+    - name: Checkout ${{ env.MODULES[2] }}
       uses: actions/checkout@v2
       with:
-        repository: SDP-Gang-of-Six/base
-        path: base
+        repository: ${{ env.ORG }}/${{ env.MODULES[2] }}
+        path: ${{ env.MODULES[2] }}
         ref: main
-        token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
+        token: ${{ env.ADMIN_GITHUB_TOKEN }}
 
-    - name: Checkout gateway
+    - name: Checkout ${{ env.MODULES[3] }}
       uses: actions/checkout@v2
       with:
-        repository: SDP-Gang-of-Six/gateway
-        path: gateway
+        repository: ${{ env.ORG }}/${{ env.MODULES[3] }}
+        path: ${{ env.MODULES[3] }}
         ref: main
-        token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
+        token: ${{ env.ADMIN_GITHUB_TOKEN }}
 
-    - name: Checkout illness
+    - name: Checkout ${{ env.MODULES[4] }}
       uses: actions/checkout@v2
       with:
-        repository: SDP-Gang-of-Six/illness
-        path: illness
+        repository: ${{ env.ORG }}/${{ env.MODULES[4] }}
+        path: ${{ env.MODULES[4] }}
         ref: main
-        token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
+        token: ${{ env.ADMIN_GITHUB_TOKEN }}
 
-    - name: Checkout user
+    - name: Checkout ${{ env.MODULES[5] }}
       uses: actions/checkout@v2
       with:
-        repository: SDP-Gang-of-Six/user
-        path: user
+        repository: ${{ env.ORG }}/${{ env.MODULES[5] }}
+        path: ${{ env.MODULES[5] }}
         ref: main
-        token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
+        token: ${{ env.ADMIN_GITHUB_TOKEN }}
 
-    - name: Checkout exam
+    - name: Checkout ${{ env.MODULES[6] }}
       uses: actions/checkout@v2
       with:
-        repository: SDP-Gang-of-Six/exam
-        path: exam
+        repository: ${{ env.ORG }}/${{ env.MODULES[6] }}
+        path: ${{ env.MODULES[6] }}
         ref: main
-        token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
+        token: ${{ env.ADMIN_GITHUB_TOKEN }}
 
-    - name: Checkout utils
+    - name: Checkout ${{ env.MODULES[7] }}
       uses: actions/checkout@v2
       with:
-        repository: SDP-Gang-of-Six/utils
-        path: utils
+        repository: ${{ env.ORG }}/${{ env.MODULES[7] }}
+        path: ${{ env.MODULES[7] }}
         ref: main
-        token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
+        token: ${{ env.ADMIN_GITHUB_TOKEN }}
 
-    - name: Checkout feign
+    - name: Checkout ${{ env.MODULES[8] }}
       uses: actions/checkout@v2
       with:
-        repository: SDP-Gang-of-Six/feign
-        path: feign
+        repository: ${{ env.ORG }}/${{ env.MODULES[8] }}
+        path: ${{ env.MODULES[8] }}
         ref: main
-        token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
+        token: ${{ env.ADMIN_GITHUB_TOKEN }}
 
     - name: Cache Maven packages
       uses: actions/cache@v2
@@ -92,19 +110,32 @@ jobs:
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
         restore-keys: ${{ runner.os }}-m2
 
-    - name: Build allParent with Maven
+    - name: Build ${{ env.PARENT_MODULE }} with Maven
       run: mvn clean install
-      working-directory: allParent
+      working-directory: ${{ env.PARENT_MODULE }}
 
-    - name: Build utils with Maven
-      run: mvn clean install
-      working-directory: utils
-
-    - name: Build feign with Maven
-      run: mvn clean install
-      working-directory: feign
-
-    - name: Build final jar
+    - name: Build final ${{ env.TARGET_MODULE }} jar
       run: mvn clean package
-      working-directory: data
+      working-directory: ${{ env.TARGET_MODULE }}
+
+    - name: Log in to Docker Hub
+      uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+      with:
+        username: ${{ env.DOCKERHUB_USERNAME }}
+        password: ${{ env.DOCKERHUB_PASSWORD }}
+
+    - name: Extract metadata (tags, labels) for Docker
+      id: meta
+      uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+      with:
+        images: ${{ env.DOCKERHUB_NAMESPACE }}/${{ DOCKERHUB_REPOSITORY }}
+
+    - name: Build and push Docker images
+      uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
+      with:
+        context: .
+        file: ${{ env.TARGET_MODULE }}/Dockerfile
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
 
