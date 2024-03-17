@@ -21,6 +21,7 @@ jobs:
       with:
         repository: SDP-Gang-of-Six/allParent
         path: allParent
+        branch: main
 
     - name: Build with Maven
       run: mvn clean install
@@ -30,6 +31,7 @@ jobs:
       with:
         repository: SDP-Gang-of-Six/utils
         path: utils
+        branch: main
 
     - name: Build utils with Maven
       run: mvn clean install
@@ -40,6 +42,7 @@ jobs:
       with:
         repository: SDP-Gang-of-Six/feign
         path: feign
+        branch: main
 
     - name: Build feign with Maven
       run: mvn clean install
