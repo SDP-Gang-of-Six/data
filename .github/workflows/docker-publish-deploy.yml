@@ -27,7 +27,7 @@ jobs:
       with:
         java-version: 11
         distribution: 'temurin'
-        java-package: jdk
+        java-package: 'jre'
         cache: 'jdk'
 
     - name: Checkout allParent
