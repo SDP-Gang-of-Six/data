@@ -21,7 +21,7 @@ jobs:
       with:
         repository: SDP-Gang-of-Six/allParent
         path: allParent
-        branch: main
+        token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Build with Maven
       run: mvn clean install
@@ -31,7 +31,7 @@ jobs:
       with:
         repository: SDP-Gang-of-Six/utils
         path: utils
-        branch: main
+        token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Build utils with Maven
       run: mvn clean install
@@ -42,7 +42,7 @@ jobs:
       with:
         repository: SDP-Gang-of-Six/feign
         path: feign
-        branch: main
+        token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Build feign with Maven
       run: mvn clean install
