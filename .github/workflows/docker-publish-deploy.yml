@@ -22,13 +22,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Set up JDK 11
-      uses: actions/setup-java@v2
-      with:
-        java-version: 11
-        distribution: 'adopt'
-        cache: maven
-
     - name: Checkout allParent
       uses: actions/checkout@v2
       with:
@@ -100,6 +93,13 @@ jobs:
         path: feign
         ref: main
         token: ${{ env.ADMIN_GITHUB_TOKEN }}
+
+    - name: Set up JDK 11
+      uses: actions/setup-java@v2
+      with:
+        java-version: 11
+        distribution: 'adopt'
+        cache: maven
 
     - name: Cache Maven packages
       uses: actions/cache@v2
