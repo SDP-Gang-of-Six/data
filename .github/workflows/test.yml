@@ -19,9 +19,10 @@ jobs:
     - name: Checkout allParent
       uses: actions/checkout@v2
       with:
-        repository: SDP-Gang-of-Six/allParent.git
+        repository: SDP-Gang-of-Six/allParent
         path: allParent
-        token: ${{ secrets.GITHUB_TOKEN }}
+        ref: main
+        token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
 
     - name: Build with Maven
       run: mvn clean install
@@ -29,9 +30,10 @@ jobs:
     - name: Checkout utils
       uses: actions/checkout@v2
       with:
-        repository: SDP-Gang-of-Six/utils.git
+        repository: SDP-Gang-of-Six/utils
         path: utils
-        token: ${{ secrets.GITHUB_TOKEN }}
+        ref: main
+        token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
 
     - name: Build utils with Maven
       run: mvn clean install
@@ -40,9 +42,10 @@ jobs:
     - name: Checkout feign
       uses: actions/checkout@v2
       with:
-        repository: SDP-Gang-of-Six/feign.git
+        repository: SDP-Gang-of-Six/feign
         path: feign
-        token: ${{ secrets.GITHUB_TOKEN }}
+        ref: main
+        token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
 
     - name: Build feign with Maven
       run: mvn clean install
