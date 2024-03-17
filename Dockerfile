@@ -7,4 +7,4 @@ COPY ./target/data-1.0-SNAPSHOT.jar /data/data.jar
 # 暴露端口
 EXPOSE 8080
 # 入口，java项目的启动命令
-ENTRYPOINT java -jar -Xms256m -Xms256m /data/data.jar -Dspring.profiles.active=pro
+ENTRYPOINT java -jar -Xms256m -Xms256m /data/data.jar --spring.profiles.active=pro
