@@ -2,9 +2,7 @@ package cn.wxl475.service.impl;
 
 import cn.hutool.core.thread.ThreadUtil;
 import cn.wxl475.mapper.ImagesMapper;
-import cn.wxl475.minio.MinioUtils;
 import cn.wxl475.pojo.Image;
-import cn.wxl475.redis.CacheClient;
 import cn.wxl475.service.ImagesService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,9 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Objects;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.Future;
 
@@ -24,9 +20,6 @@ public class ImagesServiceImpl implements ImagesService {
 
     @Autowired
     private ImagesMapper imagesMapper;
-
-    @Autowired
-    private MinioUtils minioUtils;
 
     /**
      * 上传图片
@@ -42,17 +35,7 @@ public class ImagesServiceImpl implements ImagesService {
         ArrayList<Future<Image>> futures = new ArrayList<>();
         for(MultipartFile image : images){
             futures.add(completionService.submit(() -> {
-                String url = minioUtils.uploadFile(image, "images/", "pet-hospital");
-                return new Image(
-                        null,
-                        userId,
-                        url,
-                        image.getOriginalFilename(),
-                        Objects.requireNonNull(image.getOriginalFilename()).substring(image.getOriginalFilename().lastIndexOf(".") + 1),
-                        image.getSize(),
-                        LocalDateTime.now(),
-                        LocalDateTime.now(),
-                        false);
+                return new Image();
             }));
         }
         ArrayList<Image> imageList = new ArrayList<>();
