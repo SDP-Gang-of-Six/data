@@ -31,6 +31,9 @@ jobs:
         java-version: 11
         distribution: 'adopt'
 
+    - name: Convert MODULES to array
+      run: IFS=',' read -ra MODULES <<< "${{ env.MODULES }}"
+
     - name: Checkout ${{ env.MODULES[0] }}
       uses: actions/checkout@v2
       with:
