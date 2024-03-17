@@ -7,11 +7,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-      with:
-        path: data
-
     - name: Set up JDK 11
       uses: actions/setup-java@v2
       with:
@@ -26,9 +21,53 @@ jobs:
         ref: main
         token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
 
-    - name: Build allParent with Maven
-      run: mvn clean install
-      working-directory: allParent
+    - name: Checkout data
+      uses: actions/checkout@v2
+      with:
+        repository: SDP-Gang-of-Six/data
+        path: data
+        ref: main
+        token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
+
+    - name: Checkout base
+      uses: actions/checkout@v2
+      with:
+        repository: SDP-Gang-of-Six/base
+        path: base
+        ref: main
+        token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
+
+    - name: Checkout gateway
+      uses: actions/checkout@v2
+      with:
+        repository: SDP-Gang-of-Six/gateway
+        path: gateway
+        ref: main
+        token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
+
+    - name: Checkout illness
+      uses: actions/checkout@v2
+      with:
+        repository: SDP-Gang-of-Six/illness
+        path: illness
+        ref: main
+        token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
+
+    - name: Checkout user
+      uses: actions/checkout@v2
+      with:
+        repository: SDP-Gang-of-Six/user
+        path: user
+        ref: main
+        token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
+
+    - name: Checkout exam
+      uses: actions/checkout@v2
+      with:
+        repository: SDP-Gang-of-Six/exam
+        path: exam
+        ref: main
+        token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
 
     - name: Checkout utils
       uses: actions/checkout@v2
@@ -38,10 +77,6 @@ jobs:
         ref: main
         token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
 
-    - name: Build utils with Maven
-      run: mvn clean install
-      working-directory: utils
-
     - name: Checkout feign
       uses: actions/checkout@v2
       with:
@@ -49,6 +84,14 @@ jobs:
         path: feign
         ref: main
         token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
+
+    - name: Build allParent with Maven
+      run: mvn clean install
+      working-directory: allParent
+
+    - name: Build utils with Maven
+      run: mvn clean install
+      working-directory: utils
 
     - name: Build feign with Maven
       run: mvn clean install
