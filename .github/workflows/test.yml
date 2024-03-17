@@ -107,3 +107,4 @@ jobs:
     - name: Build final jar
       run: mvn clean package
       working-directory: data
+
