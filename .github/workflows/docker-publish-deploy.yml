@@ -26,9 +26,7 @@ jobs:
       uses: actions/setup-java@v2
       with:
         java-version: 11
-        distribution: 'temurin'
-        java-package: 'jre'
-        cache: 'jdk'
+        distribution: 'adopt'
 
     - name: Checkout allParent
       uses: actions/checkout@v2
