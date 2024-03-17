@@ -6,7 +6,7 @@ on:
       - '*'
 
 env:
-  # dockerhub账户
+  # Dockerhub账户
   DOCKERHUB_REGISTRY: docker.io
   DOCKERHUB_USERNAME: 1715142548
   DOCKERHUB_PASSWORD: wxl5211314
