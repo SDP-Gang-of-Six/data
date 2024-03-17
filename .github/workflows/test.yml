@@ -9,12 +9,6 @@ env:
   DOCKERHUB_PASSWORD: wxl5211314
   DOCKERHUB_NAMESPACE: 1715142548
   DOCKERHUB_REPOSITORY: pet-hospital
-  # 组织名
-  ORG: SDP-Gang-of-Six
-  # 所有模块
-  MODULES: allParent,data,base,gateway,illness,user,exam,utils,feign
-  # 父模块
-  PARENT_MODULE: allParent
   # 要构建的模块
   TARGET_MODULE: data
   # 拉取其他仓库代码的token
@@ -31,78 +25,75 @@ jobs:
         java-version: 11
         distribution: 'adopt'
 
-    - name: Convert MODULES to array
-      run: IFS=',' read -ra MODULES <<< "${{ env.MODULES }}"
-
-    - name: Checkout ${{ env.MODULES[0] }}
+    - name: Checkout allParent
       uses: actions/checkout@v2
       with:
-        repository: ${{ env.ORG }}/${{ env.MODULES[0] }}
-        path: ${{ env.MODULES[0] }}
+        repository: SDP-Gang-of-Six/allParent
+        path: allParent
         ref: main
         token: ${{ env.ADMIN_GITHUB_TOKEN }}
 
-    - name: Checkout ${{ env.MODULES[1] }}
+    - name: Checkout data
       uses: actions/checkout@v2
       with:
-        repository: ${{ env.ORG }}/${{ env.MODULES[1] }}
-        path: ${{ env.MODULES[1] }}
+        repository: SDP-Gang-of-Six/data
+        path: data
         ref: main
         token: ${{ env.ADMIN_GITHUB_TOKEN }}
 
-    - name: Checkout ${{ env.MODULES[2] }}
+    - name: Checkout base
       uses: actions/checkout@v2
       with:
-        repository: ${{ env.ORG }}/${{ env.MODULES[2] }}
-        path: ${{ env.MODULES[2] }}
+        repository: SDP-Gang-of-Six/base
+        path: base
         ref: main
         token: ${{ env.ADMIN_GITHUB_TOKEN }}
 
-    - name: Checkout ${{ env.MODULES[3] }}
+    - name: Checkout illness
       uses: actions/checkout@v2
       with:
-        repository: ${{ env.ORG }}/${{ env.MODULES[3] }}
-        path: ${{ env.MODULES[3] }}
+        repository: SDP-Gang-of-Six/illness
+        path: illness
         ref: main
         token: ${{ env.ADMIN_GITHUB_TOKEN }}
 
-    - name: Checkout ${{ env.MODULES[4] }}
+    - name: Checkout user
       uses: actions/checkout@v2
       with:
-        repository: ${{ env.ORG }}/${{ env.MODULES[4] }}
-        path: ${{ env.MODULES[4] }}
+        repository: SDP-Gang-of-Six/user
+        path: user
         ref: main
         token: ${{ env.ADMIN_GITHUB_TOKEN }}
 
-    - name: Checkout ${{ env.MODULES[5] }}
+    - name: Checkout gateway
       uses: actions/checkout@v2
       with:
-        repository: ${{ env.ORG }}/${{ env.MODULES[5] }}
-        path: ${{ env.MODULES[5] }}
+        repository: SDP-Gang-of-Six/gateway
+        path: gateway
         ref: main
         token: ${{ env.ADMIN_GITHUB_TOKEN }}
 
-    - name: Checkout ${{ env.MODULES[6] }}
+    - name: Checkout exam
       uses: actions/checkout@v2
       with:
-        repository: ${{ env.ORG }}/${{ env.MODULES[6] }}
-        path: ${{ env.MODULES[6] }}
+        repository: SDP-Gang-of-Six/exam
+        path: exam
         ref: main
         token: ${{ env.ADMIN_GITHUB_TOKEN }}
 
-    - name: Checkout ${{ env.MODULES[7] }}
+    - name: Checkout utils
       uses: actions/checkout@v2
       with:
-        repository: ${{ env.ORG }}/${{ env.MODULES[7] }}
-        path: ${{ env.MODULES[7] }}
+        repository: SDP-Gang-of-Six/utils
+        path: utils
         ref: main
         token: ${{ env.ADMIN_GITHUB_TOKEN }}
 
-    - name: Checkout ${{ env.MODULES[8] }}
+    - name: Checkout feign
       uses: actions/checkout@v2
       with:
-        repository: ${{ env.ORG }}/${{ env.MODULES[8] }}
-        path: ${{ env.MODULES[8] }}
+        repository: SDP-Gang-of-Six/feign
+        path: feign
         ref: main
         token: ${{ env.ADMIN_GITHUB_TOKEN }}
 
@@ -113,9 +104,9 @@ jobs:
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
         restore-keys: ${{ runner.os }}-m2
 
-    - name: Build ${{ env.PARENT_MODULE }} with Maven
+    - name: Build allParent with Maven
       run: mvn clean install
-      working-directory: ${{ env.PARENT_MODULE }}
+      working-directory: allParent
 
     - name: Build final ${{ env.TARGET_MODULE }} jar
       run: mvn clean package
