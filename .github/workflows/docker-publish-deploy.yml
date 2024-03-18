@@ -2,8 +2,7 @@ name: Build and Deploy
 
 on:
   push:
-    tags:
-      - '*'
+    tags: [ 'v*.*.*' ]
 
 env:
   # Dockerhub账户
