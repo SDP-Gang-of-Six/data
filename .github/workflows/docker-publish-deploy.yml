@@ -21,77 +21,16 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        repository: [ allParent, data, base, illness, user, gateway, exam, utils, feign ]
 
     steps:
-    - name: Checkout allParent
+    - name: Checkout repositories
       uses: actions/checkout@v2
       with:
-        repository: SDP-Gang-of-Six/allParent
-        path: allParent
-        ref: main
-        token: ${{ env.ADMIN_GITHUB_TOKEN }}
-
-    - name: Checkout data
-      uses: actions/checkout@v2
-      with:
-        repository: SDP-Gang-of-Six/data
-        path: data
-        ref: main
-        token: ${{ env.ADMIN_GITHUB_TOKEN }}
-
-    - name: Checkout base
-      uses: actions/checkout@v2
-      with:
-        repository: SDP-Gang-of-Six/base
-        path: base
-        ref: main
-        token: ${{ env.ADMIN_GITHUB_TOKEN }}
-
-    - name: Checkout illness
-      uses: actions/checkout@v2
-      with:
-        repository: SDP-Gang-of-Six/illness
-        path: illness
-        ref: main
-        token: ${{ env.ADMIN_GITHUB_TOKEN }}
-
-    - name: Checkout user
-      uses: actions/checkout@v2
-      with:
-        repository: SDP-Gang-of-Six/user
-        path: user
-        ref: main
-        token: ${{ env.ADMIN_GITHUB_TOKEN }}
-
-    - name: Checkout gateway
-      uses: actions/checkout@v2
-      with:
-        repository: SDP-Gang-of-Six/gateway
-        path: gateway
-        ref: main
-        token: ${{ env.ADMIN_GITHUB_TOKEN }}
-
-    - name: Checkout exam
-      uses: actions/checkout@v2
-      with:
-        repository: SDP-Gang-of-Six/exam
-        path: exam
-        ref: main
-        token: ${{ env.ADMIN_GITHUB_TOKEN }}
-
-    - name: Checkout utils
-      uses: actions/checkout@v2
-      with:
-        repository: SDP-Gang-of-Six/utils
-        path: utils
-        ref: main
-        token: ${{ env.ADMIN_GITHUB_TOKEN }}
-
-    - name: Checkout feign
-      uses: actions/checkout@v2
-      with:
-        repository: SDP-Gang-of-Six/feign
-        path: feign
+        repository: SDP-Gang-of-Six/${{ matrix.repository }}
+        path: ${{ matrix.repository }}
         ref: main
         token: ${{ env.ADMIN_GITHUB_TOKEN }}
 
@@ -137,6 +76,8 @@ jobs:
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
 
     - name: Run command via SSH
       run: sshpass -p "${{ env.ROOT_PASSWORD }}" ssh -o StrictHostKeyChecking=no root@wxl475.cn "sh /root/pet-hospital/${{ env.TARGET_MODULE }}.sh"
