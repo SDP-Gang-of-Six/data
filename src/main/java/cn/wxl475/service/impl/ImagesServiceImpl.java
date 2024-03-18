@@ -6,6 +6,7 @@ import cn.wxl475.pojo.Image;
 import cn.wxl475.service.ImagesService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,6 +22,10 @@ public class ImagesServiceImpl implements ImagesService {
     @Autowired
     private ImagesMapper imagesMapper;
 
+    @Value("${fileServer.urlPrefix}")
+    private String urlPrefix;
+
+
     /**
      * 上传图片
      * @param images
@@ -35,6 +40,7 @@ public class ImagesServiceImpl implements ImagesService {
         ArrayList<Future<Image>> futures = new ArrayList<>();
         for(MultipartFile image : images){
             futures.add(completionService.submit(() -> {
+
                 return new Image();
             }));
         }
