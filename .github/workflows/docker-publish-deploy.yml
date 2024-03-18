@@ -21,16 +21,77 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        repository: [ allParent, data, base, illness, user, gateway, exam, utils, feign ]
 
     steps:
-    - name: Checkout repositories
+    - name: Checkout allParent
       uses: actions/checkout@v2
       with:
-        repository: SDP-Gang-of-Six/${{ matrix.repository }}
-        path: ${{ matrix.repository }}
+        repository: SDP-Gang-of-Six/allParent
+        path: allParent
+        ref: main
+        token: ${{ env.ADMIN_GITHUB_TOKEN }}
+
+    - name: Checkout data
+      uses: actions/checkout@v2
+      with:
+        repository: SDP-Gang-of-Six/data
+        path: data
+        ref: main
+        token: ${{ env.ADMIN_GITHUB_TOKEN }}
+
+    - name: Checkout base
+      uses: actions/checkout@v2
+      with:
+        repository: SDP-Gang-of-Six/base
+        path: base
+        ref: main
+        token: ${{ env.ADMIN_GITHUB_TOKEN }}
+
+    - name: Checkout illness
+      uses: actions/checkout@v2
+      with:
+        repository: SDP-Gang-of-Six/illness
+        path: illness
+        ref: main
+        token: ${{ env.ADMIN_GITHUB_TOKEN }}
+
+    - name: Checkout user
+      uses: actions/checkout@v2
+      with:
+        repository: SDP-Gang-of-Six/user
+        path: user
+        ref: main
+        token: ${{ env.ADMIN_GITHUB_TOKEN }}
+
+    - name: Checkout gateway
+      uses: actions/checkout@v2
+      with:
+        repository: SDP-Gang-of-Six/gateway
+        path: gateway
+        ref: main
+        token: ${{ env.ADMIN_GITHUB_TOKEN }}
+
+    - name: Checkout exam
+      uses: actions/checkout@v2
+      with:
+        repository: SDP-Gang-of-Six/exam
+        path: exam
+        ref: main
+        token: ${{ env.ADMIN_GITHUB_TOKEN }}
+
+    - name: Checkout utils
+      uses: actions/checkout@v2
+      with:
+        repository: SDP-Gang-of-Six/utils
+        path: utils
+        ref: main
+        token: ${{ env.ADMIN_GITHUB_TOKEN }}
+
+    - name: Checkout feign
+      uses: actions/checkout@v2
+      with:
+        repository: SDP-Gang-of-Six/feign
+        path: feign
         ref: main
         token: ${{ env.ADMIN_GITHUB_TOKEN }}
 
