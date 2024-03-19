@@ -1,6 +1,7 @@
 package cn.wxl475.service.impl;
 
 import cn.hutool.core.thread.ThreadUtil;
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.URLUtil;
 import cn.wxl475.mapper.ImagesMapper;
 import cn.wxl475.pojo.Image;
@@ -46,10 +47,17 @@ public class ImagesServiceImpl extends ServiceImpl<ImagesMapper,Image> implement
         ArrayList<Future<Image>> futures = new ArrayList<>();
         for (MultipartFile image : images) {
             futures.add(completionService.submit(() -> {
-                Image image1 = new Image(
-                        null,
+                Long snowflakeNextId = IdUtil.getSnowflakeNextId();
+                String newFileName = snowflakeNextId + "_" + image.getOriginalFilename();
+                image.transferTo(new File(imagesPathInVM+newFileName)); //linux
+                return new Image(
+                        snowflakeNextId,
                         userId,
-                        null,
+                        URLUtil.normalize(
+                        urlPrefix +
+                            "images/" +
+                            newFileName
+                        ),
                         image.getOriginalFilename(),
                         image.getContentType(),
                         image.getSize(),
@@ -57,14 +65,6 @@ public class ImagesServiceImpl extends ServiceImpl<ImagesMapper,Image> implement
                         null,
                         false
                 );
-                String newFileName = image1.getImageId() + "___" + image.getOriginalFilename();
-                image.transferTo(new File(imagesPathInVM+newFileName)); //linux
-                image1.setImageUrl(URLUtil.normalize(
-                            urlPrefix +
-                                "/images/" +
-                                newFileName
-                ));
-                return image1;
             }));
         }
         ArrayList<Image> imageList = new ArrayList<>();
