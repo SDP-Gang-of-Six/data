@@ -60,8 +60,8 @@ public class ImagesServiceImpl implements ImagesService {
                         false
                 );
                 String newFileName = new SimpleDateFormat("yyyy-MM-dd-hh-mm-ss").format(new Date()) + "_" + image.getOriginalFilename();
-                image.transferTo(new File("D:\\"+newFileName)); //windows
-//                image.transferTo(new File(imagesPathInVM+newFileName)); //linux
+//                image.transferTo(new File("D:\\"+newFileName)); //windows
+                image.transferTo(new File(imagesPathInVM+newFileName)); //linux
                 image1.setImageUrl(URLUtil.normalize(
                             urlPrefix +
                                 "/images/" +
