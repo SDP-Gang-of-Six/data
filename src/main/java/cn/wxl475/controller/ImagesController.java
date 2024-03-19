@@ -54,7 +54,7 @@ public class ImagesController {
     }
 
     @PostMapping("/deleteImages")
-    public Result deleteImages(@RequestHeader String Authorization, @RequestBody ArrayList<String> imageIds) {
+    public Result deleteImages(@RequestHeader String Authorization, @RequestBody ArrayList<Long> imageIds) {
         Claims claims = JwtUtils.parseJWT(Authorization, signKey);
         if (claims == null) {
             return Result.error("token无效");
