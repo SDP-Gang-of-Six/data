@@ -5,6 +5,7 @@ import cn.hutool.core.util.URLUtil;
 import cn.wxl475.mapper.ImagesMapper;
 import cn.wxl475.pojo.Image;
 import cn.wxl475.service.ImagesService;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,15 +14,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.Future;
 
 @Slf4j
 @Service
-public class ImagesServiceImpl implements ImagesService {
+public class ImagesServiceImpl extends ServiceImpl<ImagesMapper,Image> implements ImagesService {
 
     @Autowired
     private ImagesMapper imagesMapper;
@@ -42,7 +41,6 @@ public class ImagesServiceImpl implements ImagesService {
     @Override
     @Transactional
     public ArrayList<Image> uploadImages(ArrayList<MultipartFile> images, Long userId) {
-        log.debug(userId.toString());
         // 上传文件
         CompletionService<Image> completionService = ThreadUtil.newCompletionService();
         ArrayList<Future<Image>> futures = new ArrayList<>();
@@ -59,8 +57,7 @@ public class ImagesServiceImpl implements ImagesService {
                         null,
                         false
                 );
-                String newFileName = new SimpleDateFormat("yyyy-MM-dd-hh-mm-ss").format(new Date()) + "_" + image.getOriginalFilename();
-//                image.transferTo(new File("D:\\"+newFileName)); //windows
+                String newFileName = image1.getImageId() + "___" + image.getOriginalFilename();
                 image.transferTo(new File(imagesPathInVM+newFileName)); //linux
                 image1.setImageUrl(URLUtil.normalize(
                             urlPrefix +
@@ -84,10 +81,5 @@ public class ImagesServiceImpl implements ImagesService {
             imageList.add(image); //要在数据库操作后再加入列表，获取插入后返回的id和时间
         }
         return imageList;
-    }
-
-    @Override
-    public Object deleteImages(ArrayList<String> imageIds) {
-        return null;
     }
 }

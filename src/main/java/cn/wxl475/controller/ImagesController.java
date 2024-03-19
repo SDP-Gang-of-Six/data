@@ -63,6 +63,6 @@ public class ImagesController {
         }else if(imageIds == null || imageIds.isEmpty()){
             return Result.success("无文件删除");
         }
-        return Result.success(imagesService.deleteImages(imageIds));
+        return Result.success(imagesService.removeByIds(imageIds));
     }
 }
