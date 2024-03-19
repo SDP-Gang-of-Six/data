@@ -45,12 +45,12 @@ public class ImagesController {
         Claims claims = JwtUtils.parseJWT(Authorization, signKey);
         if (claims == null) {
             return Result.error("token无效");
-        }else if(claims.get("userType")!=Integer.valueOf(userType.ADMIN.ordinal())){
+        }else if(!((Boolean) claims.get("userType"))){
             return Result.error("权限不足");
         }else if(images == null || images.isEmpty()){
             return Result.error("上传文件为空");
         }
-        return Result.success(imagesService.uploadImages(images, (Long) claims.get("userId")));
+        return Result.success(imagesService.uploadImages(images,Long.valueOf(claims.get("uid").toString())));
     }
 
     @PostMapping("/deleteImages")
@@ -58,7 +58,7 @@ public class ImagesController {
         Claims claims = JwtUtils.parseJWT(Authorization, signKey);
         if (claims == null) {
             return Result.error("token无效");
-        }else if(claims.get("userType")!=Integer.valueOf(userType.ADMIN.ordinal())){
+        }else if(!((Boolean) claims.get("userType"))){
             return Result.error("权限不足");
         }else if(imageIds == null || imageIds.isEmpty()){
             return Result.success("无文件删除");

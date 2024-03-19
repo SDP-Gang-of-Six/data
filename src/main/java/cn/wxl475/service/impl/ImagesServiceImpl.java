@@ -12,8 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -43,6 +42,7 @@ public class ImagesServiceImpl implements ImagesService {
     @Override
     @Transactional
     public ArrayList<Image> uploadImages(ArrayList<MultipartFile> images, Long userId) {
+        log.debug(userId.toString());
         // 上传文件
         CompletionService<Image> completionService = ThreadUtil.newCompletionService();
         ArrayList<Future<Image>> futures = new ArrayList<>();
@@ -59,8 +59,9 @@ public class ImagesServiceImpl implements ImagesService {
                         null,
                         false
                 );
-                String newFileName = new SimpleDateFormat("yyyy-MM-dd-hh:mm:ss").format(new Date()) + "_" + image.getOriginalFilename();
-                Files.write(Path.of(imagesPathInVM + newFileName), image.getBytes());
+                String newFileName = new SimpleDateFormat("yyyy-MM-dd-hh-mm-ss").format(new Date()) + "_" + image.getOriginalFilename();
+                image.transferTo(new File("D:\\"+newFileName)); //windows
+//                image.transferTo(new File(imagesPathInVM+newFileName)); //linux
                 image1.setImageUrl(URLUtil.normalize(
                             urlPrefix +
                                 "/images/" +
@@ -75,10 +76,12 @@ public class ImagesServiceImpl implements ImagesService {
             try {
                 image = future.get();
             } catch (Exception e) {
+                imageList.add(image);
                 log.error("写文件线程结果获取失败，该线程索引："+futures.indexOf(future), e);
+                continue;
             }
             imagesMapper.insert(image);
-            imageList.add(image);
+            imageList.add(image); //要在数据库操作后再加入列表，获取插入后返回的id和时间
         }
         return imageList;
     }
