@@ -156,7 +156,7 @@ public class ImagesServiceImpl extends ServiceImpl<ImagesMapper,Image> implement
      */
     @Override
     @Transactional
-    public Image searchImagesById(String imageId) {
+    public Image searchImagesById(Long imageId) {
         return cacheClient.queryWithPassThrough(CACHE_IMAGEDETAIL_KEY,LOCK_IMAGEDETAIL_KEY,imageId,Image.class,imagesMapper::selectById,CACHE_IMAGEDETAIL_TTL, TimeUnit.MINUTES);
     }
 }

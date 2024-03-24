@@ -98,13 +98,13 @@ public class ImagesController {
      * @return  Result      响应
      */
     @PostMapping("/searchImageById")
-    public Result searchImagesById(@RequestHeader String Authorization, @RequestParam String imageId) {
+    public Result searchImagesById(@RequestHeader String Authorization, @RequestParam Long imageId) {
         Claims claims = JwtUtils.parseJWT(Authorization, signKey);
         if (claims == null) {
             return Result.error("token无效");
         }else if(!((Boolean) claims.get("userType"))){
             return Result.error("权限不足");
-        }else if(imageId == null || imageId.isEmpty()){
+        }else if(imageId == null){
             return Result.error("Id为空");
         }
         return Result.success(imagesService.searchImagesById(imageId));
