@@ -131,11 +131,11 @@ public class ImagesServiceImpl extends ServiceImpl<ImagesMapper,Image> implement
     @Transactional
     public ArrayList<Image> searchImagesWithKeyword(String keyword, Integer pageNum, Integer pageSize) {
         ArrayList<Image> images = new ArrayList<>();
-        NativeSearchQuery query = new NativeSearchQueryBuilder().
-                withQuery(QueryBuilders.matchQuery("imageName", keyword)).
-                withPageable(PageRequest.of(pageNum, pageSize)).
-                build();
-        SearchHits<Image> hits = elasticsearchRestTemplate.search(query, Image.class);
+        NativeSearchQueryBuilder queryBuilder = new NativeSearchQueryBuilder().withPageable(PageRequest.of(pageNum-1, pageSize));
+        if(!keyword.isEmpty()){
+            queryBuilder.withQuery(QueryBuilders.matchQuery("imageName", keyword));
+        }
+        SearchHits<Image> hits = elasticsearchRestTemplate.search(queryBuilder.build(), Image.class);
         hits.forEach(image -> images.add(image.getContent()));
         return images;
     }
