@@ -1,26 +1,16 @@
 package cn.wxl475.controller;
 
 import cn.wxl475.pojo.Result;
-import cn.wxl475.pojo.enums.userType;
 import cn.wxl475.service.ImagesService;
 import cn.wxl475.utils.JwtUtils;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.annotation.Resource;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.*;
-import java.net.URLEncoder;
-import java.nio.file.Files;
-import java.util.*;
+import java.util.ArrayList;
 
 @Slf4j
 @RestController
