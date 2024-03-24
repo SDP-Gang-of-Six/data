@@ -92,6 +92,8 @@ public class ImagesController {
             return Result.error("token无效");
         }else if(!((Boolean) claims.get("userType"))){
             return Result.error("权限不足");
+        }else if(pageNum<=0||pageSize<=0){
+            return Result.error("页码或页大小不合法");
         }
         return Result.success(imagesService.searchImagesWithKeyword(keyword,pageNum,pageSize));
     }
