@@ -45,13 +45,11 @@ public class ImagesEsTest {
 
     @Test
     public void findAllImages(){
-        Class<Image> aClass = Image.class;
         imagesEsRepo.findAll().forEach(image -> { log.info(String.valueOf(image));});
     }
 
     @Test
     public void deleteAllImages(){
-        Class<Image> aClass = Image.class;
         imagesEsRepo.deleteAll();
     }
 }
