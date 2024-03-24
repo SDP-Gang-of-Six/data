@@ -5,6 +5,7 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.URLUtil;
 import cn.wxl475.mapper.ImagesMapper;
 import cn.wxl475.pojo.Image;
+import cn.wxl475.repo.ImagesEsRepo;
 import cn.wxl475.service.ImagesService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -25,11 +26,14 @@ public class ImagesServiceImpl extends ServiceImpl<ImagesMapper,Image> implement
 
     @Autowired
     private ImagesMapper imagesMapper;
+    @Autowired
+    private ImagesEsRepo imagesEsRepo;
 
     @Value("${fileServer.urlPrefix}")
     private String urlPrefix;
 
-    private final String imagesPathInVM = "/data/pet-hospital/images/";
+    private final String imagesPathInVM = "/data/pet-hospital/images/"; //linux
+    private final String imagesPathInWindows = "D:/"; //windows
 
 
     /**
@@ -49,7 +53,7 @@ public class ImagesServiceImpl extends ServiceImpl<ImagesMapper,Image> implement
             futures.add(completionService.submit(() -> {
                 Long snowflakeNextId = IdUtil.getSnowflakeNextId();
                 String newFileName = snowflakeNextId + "_" + image.getOriginalFilename();
-                image.transferTo(new File(imagesPathInVM+newFileName)); //linux
+                image.transferTo(new File(imagesPathInVM+newFileName));
                 return new Image(
                         snowflakeNextId,
                         userId,
@@ -78,6 +82,7 @@ public class ImagesServiceImpl extends ServiceImpl<ImagesMapper,Image> implement
                 continue;
             }
             imagesMapper.insert(image);
+            imagesEsRepo.save(image);
             imageList.add(image); //要在数据库操作后再加入列表，获取插入后返回的id和时间
         }
         return imageList;
