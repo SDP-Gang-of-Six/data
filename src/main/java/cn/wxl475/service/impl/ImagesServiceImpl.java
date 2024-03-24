@@ -5,12 +5,19 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.URLUtil;
 import cn.wxl475.mapper.ImagesMapper;
 import cn.wxl475.pojo.Image;
+import cn.wxl475.redis.CacheClient;
 import cn.wxl475.repo.ImagesEsRepo;
 import cn.wxl475.service.ImagesService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
+import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,6 +26,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+
+import static cn.wxl475.redis.RedisConstants.*;
 
 @Slf4j
 @Service
@@ -28,6 +38,10 @@ public class ImagesServiceImpl extends ServiceImpl<ImagesMapper,Image> implement
     private ImagesMapper imagesMapper;
     @Autowired
     private ImagesEsRepo imagesEsRepo;
+    @Autowired
+    private CacheClient cacheClient;
+    @Autowired
+    private ElasticsearchRestTemplate elasticsearchRestTemplate;
 
     @Value("${fileServer.urlPrefix}")
     private String urlPrefix;
@@ -86,5 +100,35 @@ public class ImagesServiceImpl extends ServiceImpl<ImagesMapper,Image> implement
             imageList.add(image); //要在数据库操作后再加入列表，获取插入后返回的id和时间
         }
         return imageList;
+    }
+
+    @Override
+    @Transactional
+    public Boolean deleteImages(ArrayList<Long> imageIds) {
+        imagesMapper.deleteBatchIds(imageIds);
+        imagesEsRepo.deleteAllById(imageIds);
+        imageIds.forEach(imageId->{
+            cacheClient.delete(CACHE_IMAGEDETAIL_KEY+imageId);
+        });
+        return true;
+    }
+
+    @Override
+    @Transactional
+    public ArrayList<Image> searchImagesWithKeyword(String keyword, Integer pageNum, Integer pageSize) {
+        ArrayList<Image> images = new ArrayList<>();
+        NativeSearchQuery query = new NativeSearchQueryBuilder().
+                withQuery(QueryBuilders.matchQuery("imageName", keyword)).
+                withPageable(PageRequest.of(pageNum, pageSize)).
+                build();
+        SearchHits<Image> hits = elasticsearchRestTemplate.search(query, Image.class);
+        hits.forEach(image -> images.add(image.getContent()));
+        return images;
+    }
+
+    @Override
+    @Transactional
+    public Image searchImagesById(String imageId) {
+        return cacheClient.queryWithPassThrough(CACHE_IMAGEDETAIL_KEY,LOCK_IMAGEDETAIL_KEY,imageId,Image.class,imagesMapper::selectById,CACHE_IMAGEDETAIL_TTL, TimeUnit.MINUTES);
     }
 }

@@ -14,4 +14,10 @@ public interface ImagesService extends IService<Image> {
      * @return
      */
     ArrayList<Image> uploadImages(ArrayList<MultipartFile> images, Long userId);
+
+    Boolean deleteImages(ArrayList<Long> imageIds);
+
+    ArrayList<Image> searchImagesWithKeyword(String keyword,Integer pageNum,Integer pageSize);
+
+    Image searchImagesById(String imageId);
 }
