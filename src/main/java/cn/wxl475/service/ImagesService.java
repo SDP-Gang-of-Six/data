@@ -17,7 +17,7 @@ public interface ImagesService extends IService<Image> {
 
     Boolean deleteImages(ArrayList<Long> imageIds);
 
-    ArrayList<Image> searchImagesWithKeyword(String keyword,Integer pageNum,Integer pageSize);
+    ArrayList<Image> searchImagesWithKeyword(String keyword,Integer pageNum,Integer pageSize,String sortField,Integer sortOrder);
 
     Image searchImagesById(String imageId);
 }

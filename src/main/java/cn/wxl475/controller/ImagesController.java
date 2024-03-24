@@ -86,7 +86,9 @@ public class ImagesController {
     public Result searchImagesByKeyword(@RequestHeader String Authorization,
                                         @RequestParam(required = false) String keyword,
                                         @RequestParam Integer pageNum,
-                                        @RequestParam Integer pageSize) {
+                                        @RequestParam Integer pageSize,
+                                        @RequestParam(required = false) String sortField,
+                                        @RequestParam(required = false) Integer sortOrder){
         Claims claims = JwtUtils.parseJWT(Authorization, signKey);
         if (claims == null) {
             return Result.error("token无效");
@@ -95,7 +97,7 @@ public class ImagesController {
         }else if(pageNum<=0||pageSize<=0){
             return Result.error("页码或页大小不合法");
         }
-        return Result.success(imagesService.searchImagesWithKeyword(keyword,pageNum,pageSize));
+        return Result.success(imagesService.searchImagesWithKeyword(keyword,pageNum,pageSize,sortField,sortOrder));
     }
 
     /**

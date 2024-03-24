@@ -11,6 +11,9 @@ import cn.wxl475.service.ImagesService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.sort.SortBuilder;
+import org.elasticsearch.search.sort.SortBuilders;
+import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
@@ -129,12 +132,19 @@ public class ImagesServiceImpl extends ServiceImpl<ImagesMapper,Image> implement
      */
     @Override
     @Transactional
-    public ArrayList<Image> searchImagesWithKeyword(String keyword, Integer pageNum, Integer pageSize) {
+    public ArrayList<Image> searchImagesWithKeyword(String keyword, Integer pageNum, Integer pageSize, String sortField, Integer sortOrder) {
         ArrayList<Image> images = new ArrayList<>();
         NativeSearchQueryBuilder queryBuilder = new NativeSearchQueryBuilder().withPageable(PageRequest.of(pageNum-1, pageSize));
-        if(!keyword.isEmpty()){
-            queryBuilder.withQuery(QueryBuilders.matchQuery("imageName", keyword));
+        if(keyword!=null && !keyword.isEmpty()){
+            queryBuilder.withQuery(QueryBuilders.multiMatchQuery(keyword,"imageName","imageUrl","imageType","createTime","updateTime"));
         }
+        if(sortField==null || sortField.isEmpty()){
+            sortField = "imageId";
+        }
+        if(sortOrder==null || !(sortOrder==1 || sortOrder==-1)){
+            sortOrder=-1;
+        }
+        queryBuilder.withSorts(SortBuilders.fieldSort(sortField).order(sortOrder==-1?SortOrder.DESC:SortOrder.ASC));
         SearchHits<Image> hits = elasticsearchRestTemplate.search(queryBuilder.build(), Image.class);
         hits.forEach(image -> images.add(image.getContent()));
         return images;
