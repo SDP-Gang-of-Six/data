@@ -13,7 +13,6 @@ public class MyMetaObjectHandler implements MetaObjectHandler {
     @Override
     public void insertFill(MetaObject metaObject) {
         log.info("插入：填充createTime");
-        //strictInsertFill(MetaObject metaObject, String fieldName, Class<T> fieldType, E fieldVal)
         this.strictInsertFill(metaObject,"createTime", String.class, DateUtil.now());// 起始版本 3.3.0(推荐使用)
         log.info("插入：填充updateTime");
         this.strictInsertFill(metaObject, "updateTime", String.class, DateUtil.now()); // 起始版本 3.3.0(推荐)
