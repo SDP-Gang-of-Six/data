@@ -53,9 +53,9 @@ public class ImagesServiceImpl extends ServiceImpl<ImagesMapper,Image> implement
     /**
      * 上传图片
      *
-     * @param images
-     * @param userId
-     * @return
+     * @param images            图片
+     * @param userId            用户id
+     * @return ArrayList<Image> 图片列表
      */
     @Override
     @Transactional
@@ -102,6 +102,12 @@ public class ImagesServiceImpl extends ServiceImpl<ImagesMapper,Image> implement
         return imageList;
     }
 
+    /**
+     * 删除图片
+     *
+     * @param imageIds 图片id
+     * @return Boolean 是否成功
+     */
     @Override
     @Transactional
     public Boolean deleteImages(ArrayList<Long> imageIds) {
@@ -113,6 +119,14 @@ public class ImagesServiceImpl extends ServiceImpl<ImagesMapper,Image> implement
         return true;
     }
 
+    /**
+     * 按关键词查询图片
+     *
+     * @param keyword   关键词
+     * @param pageNum   页码
+     * @param pageSize  页大小
+     * @return ArrayList<Image> 图片列表
+     */
     @Override
     @Transactional
     public ArrayList<Image> searchImagesWithKeyword(String keyword, Integer pageNum, Integer pageSize) {
@@ -126,6 +140,12 @@ public class ImagesServiceImpl extends ServiceImpl<ImagesMapper,Image> implement
         return images;
     }
 
+    /**
+     * 按图片id查询
+     *
+     * @param imageId   图片id
+     * @return Image    图片
+     */
     @Override
     @Transactional
     public Image searchImagesById(String imageId) {
