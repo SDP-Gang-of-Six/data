@@ -29,12 +29,9 @@ public class VideosController {
                                          @RequestParam String videoMd5,
                                          @RequestParam String shardingMd5,
                                          @RequestParam String shardingInVideoIndex,
-                                         @RequestParam String shardingInVideoStart,
-                                         @RequestParam String shardingInVideoEnd,
-                                         @RequestParam String allShardingNums,
-                                         @RequestParam String videoSize){
+                                         @RequestParam String allShardingNums){
         try {
-            return Result.success(videosService.uploadOneVideoSharding(videoSharding,videoMd5,shardingMd5,shardingInVideoIndex,shardingInVideoStart,shardingInVideoEnd,allShardingNums,videoSize));
+            return Result.success(videosService.uploadOneVideoSharding(videoSharding,videoMd5,shardingMd5,shardingInVideoIndex,allShardingNums));
         } catch (IOException e) {
             throw new FileIOException(e.getMessage());
         }
