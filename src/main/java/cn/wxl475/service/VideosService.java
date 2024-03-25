@@ -1,7 +1,14 @@
 package cn.wxl475.service;
 
+import cn.wxl475.pojo.data.Video;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
 public interface VideosService {
-    Boolean uploadOneVideoSharding(MultipartFile videoSharding, String videoMd5, String shardingMd5, String shardingInVideoIndex, String shardingInVideoStart, String shardingInVideoEnd, String allShardingNums, String videoSize);
+    Boolean uploadOneVideoSharding(MultipartFile videoSharding, String videoMd5, String shardingMd5, String shardingInVideoIndex, String shardingInVideoStart, String shardingInVideoEnd, String allShardingNums, String videoSize) throws IOException;
+
+    Boolean checkOneVideoSharding(String videoMd5, String shardingInVideoIndex, String shardingMd5);
+
+    Video mergeVideoShardings(String videoMd5, String videoOriginalName, Long uid) throws IOException;
 }
