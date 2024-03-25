@@ -19,7 +19,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,10 +38,13 @@ public class VideosServiceImpl extends ServiceImpl<VideosMapper, Video> implemen
     @Value("${fileServer.urlPrefix}")
     private String urlPrefix;
 
-    private final String videosPathInVM = "/data/pet-hospital/videos/"; //linux
-    private final String videoShardingsPathInVM = "/data/pet-hospital/videos/shardings/"; //linux
-    private final String videosPathInWindows = "D:/"; //windows
-    private final String videoShardingsPathInWindows = "D:/"; //windows
+    private final String videosPathInVM; //linux
+    private final String videoShardingsPathInVM; //linux
+
+    public VideosServiceImpl() {
+        videosPathInVM = "/data/pet-hospital/videos/";
+        videoShardingsPathInVM = "/data/pet-hospital/videos/shardings/";
+    }
 
     @Override
     public Boolean uploadOneVideoSharding(MultipartFile videoSharding, String videoMd5, String shardingMd5, String shardingInVideoIndex, String allShardingNums) throws IOException {
