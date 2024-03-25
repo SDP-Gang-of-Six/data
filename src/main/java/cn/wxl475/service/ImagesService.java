@@ -1,6 +1,6 @@
 package cn.wxl475.service;
 
-import cn.wxl475.pojo.Image;
+import cn.wxl475.pojo.data.Image;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.springframework.web.multipart.MultipartFile;
 

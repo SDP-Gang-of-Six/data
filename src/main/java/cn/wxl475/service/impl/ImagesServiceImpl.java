@@ -4,7 +4,7 @@ import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.URLUtil;
 import cn.wxl475.mapper.ImagesMapper;
-import cn.wxl475.pojo.Image;
+import cn.wxl475.pojo.data.Image;
 import cn.wxl475.redis.CacheClient;
 import cn.wxl475.repo.ImagesEsRepo;
 import cn.wxl475.service.ImagesService;

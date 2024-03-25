@@ -1,6 +1,6 @@
 package cn.wxl475.mapper;
 
-import cn.wxl475.pojo.Image;
+import cn.wxl475.pojo.data.Image;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
