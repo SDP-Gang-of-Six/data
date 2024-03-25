@@ -67,15 +67,15 @@ public class ImagesServiceImpl extends ServiceImpl<ImagesMapper,Image> implement
         for (MultipartFile image : images) {
             futures.add(completionService.submit(() -> {
                 Long snowflakeNextId = IdUtil.getSnowflakeNextId();
-                String newFileName = snowflakeNextId + "_" + image.getOriginalFilename();
-                image.transferTo(new File(imagesPathInVM+newFileName));
+                String newImageName = snowflakeNextId + "_" + image.getOriginalFilename();
+                image.transferTo(new File(imagesPathInVM+newImageName));
                 return new Image(
                         snowflakeNextId,
                         userId,
                         URLUtil.normalize(
                         urlPrefix +
                             "images/" +
-                            newFileName
+                            newImageName
                         ),
                         image.getOriginalFilename(),
                         image.getContentType(),
