@@ -3,7 +3,6 @@ package cn.wxl475.controller;
 import cn.wxl475.exception.FileIOException;
 import cn.wxl475.pojo.Result;
 import cn.wxl475.pojo.data.Video;
-import cn.wxl475.redis.CacheClient;
 import cn.wxl475.service.VideosService;
 import cn.wxl475.utils.JwtUtils;
 import io.jsonwebtoken.Claims;
