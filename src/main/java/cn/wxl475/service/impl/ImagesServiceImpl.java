@@ -129,7 +129,6 @@ public class ImagesServiceImpl extends ServiceImpl<ImagesMapper,Image> implement
      * @return ArrayList<Image> 图片列表
      */
     @Override
-    @Transactional
     public ArrayList<Image> searchImagesWithKeyword(String keyword, Integer pageNum, Integer pageSize, String sortField, Integer sortOrder) {
         ArrayList<Image> images = new ArrayList<>();
         NativeSearchQueryBuilder queryBuilder = new NativeSearchQueryBuilder().withPageable(PageRequest.of(pageNum-1, pageSize));
@@ -155,7 +154,6 @@ public class ImagesServiceImpl extends ServiceImpl<ImagesMapper,Image> implement
      * @return Image    图片
      */
     @Override
-    @Transactional
     public Image searchImagesById(Long imageId) {
         return cacheClient.queryWithPassThrough(CACHE_IMAGEDETAIL_KEY,LOCK_IMAGEDETAIL_KEY,imageId,Image.class,imagesMapper::selectById,CACHE_IMAGEDETAIL_TTL, TimeUnit.MINUTES);
     }
