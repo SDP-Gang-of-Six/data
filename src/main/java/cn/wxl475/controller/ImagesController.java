@@ -33,12 +33,8 @@ public class ImagesController {
     @PostMapping("/uploadImages")
     public Result uploadImages(@RequestHeader String Authorization, @RequestBody ArrayList<MultipartFile> images) {
         Claims claims = JwtUtils.parseJWT(Authorization, signKey);
-        if (claims == null) {
-            return Result.error("token无效");
-        }else if(!((Boolean) claims.get("userType"))){
-            return Result.error("权限不足");
-        }else if(images == null || images.isEmpty()){
-            return Result.error("上传文件为空");
+        if(images.isEmpty()){
+            return Result.error("上传图片为空");
         }
         return Result.success(imagesService.uploadImages(images,Long.valueOf(claims.get("uid").toString())));
     }
@@ -52,13 +48,8 @@ public class ImagesController {
      */
     @PostMapping("/deleteImages")
     public Result deleteImages(@RequestHeader String Authorization, @RequestBody ArrayList<Long> imageIds) {
-        Claims claims = JwtUtils.parseJWT(Authorization, signKey);
-        if (claims == null) {
-            return Result.error("token无效");
-        }else if(!((Boolean) claims.get("userType"))){
-            return Result.error("权限不足");
-        }else if(imageIds == null || imageIds.isEmpty()){
-            return Result.success("无文件删除");
+        if(imageIds.isEmpty()){
+            return Result.error("无图片需要删除");
         }
         return Result.success(imagesService.deleteImages(imageIds));
     }
@@ -79,12 +70,7 @@ public class ImagesController {
                                         @RequestParam Integer pageSize,
                                         @RequestParam(required = false) String sortField,
                                         @RequestParam(required = false) Integer sortOrder){
-        Claims claims = JwtUtils.parseJWT(Authorization, signKey);
-        if (claims == null) {
-            return Result.error("token无效");
-        }else if(!((Boolean) claims.get("userType"))){
-            return Result.error("权限不足");
-        }else if(pageNum<=0||pageSize<=0){
+        if(pageNum<=0||pageSize<=0){
             return Result.error("页码或页大小不合法");
         }
         return Result.success(imagesService.searchImagesWithKeyword(keyword,pageNum,pageSize,sortField,sortOrder));
@@ -98,15 +84,7 @@ public class ImagesController {
      * @return  Result      响应
      */
     @PostMapping("/searchImageById")
-    public Result searchImagesById(@RequestHeader String Authorization, @RequestParam Long imageId) {
-        Claims claims = JwtUtils.parseJWT(Authorization, signKey);
-        if (claims == null) {
-            return Result.error("token无效");
-        }else if(!((Boolean) claims.get("userType"))){
-            return Result.error("权限不足");
-        }else if(imageId == null){
-            return Result.error("Id为空");
-        }
+    public Result searchImagesById(@RequestHeader String Authorization,@RequestParam Long imageId) {
         return Result.success(imagesService.searchImagesById(imageId));
     }
 }
