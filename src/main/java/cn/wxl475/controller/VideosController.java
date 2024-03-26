@@ -107,7 +107,7 @@ public class VideosController {
      * @param videoIds
      * @return
      */
-    @PostMapping("/data/deleteVideos")
+    @PostMapping("/deleteVideos")
     public Result deleteVideos(@RequestHeader String Authorization,
                                @RequestParam ArrayList<Long> videoIds){
         return Result.success(videosService.deleteVideos(videoIds));
