@@ -74,7 +74,7 @@ public class VideosController {
                                      @RequestParam String videoMd5,
                                      @RequestParam String videoOriginalName){
         Claims claims = JwtUtils.parseJWT(Authorization,signKey);
-        Video video = null;
+        Video video;
         try {
             video = videosService.mergeVideoSharding(
                     videoMd5,
