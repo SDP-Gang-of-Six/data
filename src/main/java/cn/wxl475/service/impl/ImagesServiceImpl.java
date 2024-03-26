@@ -95,7 +95,7 @@ public class ImagesServiceImpl extends ServiceImpl<ImagesMapper,Image> implement
                             "images/" +
                             newImageName
                         ),
-                        image.getOriginalFilename(),
+                        newImageName.substring(newImageName.indexOf("_")+1),
                         type,
                         image.getSize(),
                         null,
