@@ -155,6 +155,12 @@ public class VideosServiceImpl extends ServiceImpl<VideosMapper, Video> implemen
         return video;
     }
 
+    @Override
+    public Boolean deleteVideoSharding(String videoMd5) {
+        delTmpFile(videoMd5);
+        return true;
+    }
+
     private boolean checkBeforeMerge(String videoMd5) {
         Map<String, String> map = cacheClient.getHashMap(videoMd5);
         String videoShardingNum = map.get("video_sharding_num");
@@ -179,6 +185,8 @@ public class VideosServiceImpl extends ServiceImpl<VideosMapper, Video> implemen
             }
             list.add(hashKey);
         }
-        cacheClient.deleteHashKeys(md5Value,list);
+        if(!list.isEmpty()) {
+            cacheClient.deleteHashKeys(md5Value,list);
+        }
     }
 }

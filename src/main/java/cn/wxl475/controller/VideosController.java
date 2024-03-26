@@ -62,4 +62,10 @@ public class VideosController {
         }
         return Result.success(video);
     }
+
+    @PostMapping("/deleteVideoSharding")
+    public Result deleteVideoSharding(@RequestHeader String Authorization,
+                                      @RequestParam String videoMd5){
+        return Result.success(videosService.deleteVideoSharding(videoMd5));
+    }
 }

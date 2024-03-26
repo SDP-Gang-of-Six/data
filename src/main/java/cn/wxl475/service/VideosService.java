@@ -11,4 +11,6 @@ public interface VideosService {
     Boolean checkOneVideoSharding(String videoMd5, String shardingInVideoIndex, String shardingMd5);
 
     Video mergeVideoSharding(String videoMd5, String videoOriginalName, Long uid) throws IOException;
+
+    Boolean deleteVideoSharding(String videoMd5);
 }
