@@ -1,5 +1,7 @@
 package cn.wxl475.service.impl;
 
+import cn.hutool.core.img.ImgUtil;
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.URLUtil;
@@ -26,9 +28,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static cn.wxl475.redis.RedisConstants.*;
 
@@ -61,15 +65,28 @@ public class ImagesServiceImpl extends ServiceImpl<ImagesMapper,Image> implement
      */
     @Override
     @Transactional
-    public ArrayList<Image> uploadImages(ArrayList<MultipartFile> images, Long userId) {
+    public ArrayList<Image> uploadImages(ArrayList<MultipartFile> images,ArrayList<String> newImageTypes, Long userId) {
         // 上传文件
         CompletionService<Image> completionService = ThreadUtil.newCompletionService();
         ArrayList<Future<Image>> futures = new ArrayList<>();
-        for (MultipartFile image : images) {
+        for (int i=0;i<images.size();i++){
+            MultipartFile image = images.get(i);
+            AtomicReference<String> newImageType = new AtomicReference<>(newImageTypes.get(i));
             futures.add(completionService.submit(() -> {
                 Long snowflakeNextId = IdUtil.getSnowflakeNextId();
                 String newImageName = snowflakeNextId + "_" + image.getOriginalFilename();
-                image.transferTo(new File(imagesPathInVM+newImageName));
+                String type = image.getContentType();
+                File file = new File(imagesPathInVM + newImageName);
+                image.transferTo(file);
+                String newImageTypeString = newImageType.get();
+                if(newImageTypeString !=null && !newImageTypeString.isEmpty()){
+                    type= newImageTypeString;
+                    newImageName = snowflakeNextId + "_" + Objects.requireNonNull(image.getOriginalFilename()).substring(0,image.getOriginalFilename().lastIndexOf(".")+1)+newImageTypeString;
+                    File file1 = FileUtil.file(imagesPathInVM + newImageName);
+                    ImgUtil.convert(file,file1);
+                    boolean deleted = file.delete();
+                    log.info("删除原图片："+deleted);
+                }
                 return new Image(
                         snowflakeNextId,
                         userId,
@@ -79,7 +96,7 @@ public class ImagesServiceImpl extends ServiceImpl<ImagesMapper,Image> implement
                             newImageName
                         ),
                         image.getOriginalFilename(),
-                        image.getContentType(),
+                        type,
                         image.getSize(),
                         null,
                         null,
