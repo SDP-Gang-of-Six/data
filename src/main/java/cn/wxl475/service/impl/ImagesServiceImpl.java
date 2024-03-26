@@ -53,7 +53,7 @@ public class ImagesServiceImpl extends ServiceImpl<ImagesMapper,Image> implement
     private String urlPrefix;
 
     private final String imagesPathInVM = "/data/pet-hospital/images/"; //linux
-//    private final String imagesPathInWindows = "D:/"; //windows
+    private final String imagesPathInWindows = "D:/"; //windows
 
 
     /**
@@ -76,13 +76,13 @@ public class ImagesServiceImpl extends ServiceImpl<ImagesMapper,Image> implement
                 Long snowflakeNextId = IdUtil.getSnowflakeNextId();
                 String newImageName = snowflakeNextId + "_" + image.getOriginalFilename();
                 String type = image.getContentType();
-                File file = new File(imagesPathInVM + newImageName);
+                File file = new File(imagesPathInWindows + newImageName);
                 image.transferTo(file);
                 String newImageTypeString = newImageType.get();
                 if(newImageTypeString !=null && !newImageTypeString.isEmpty()){
                     type= newImageTypeString;
                     newImageName = snowflakeNextId + "_" + Objects.requireNonNull(image.getOriginalFilename()).substring(0,image.getOriginalFilename().lastIndexOf(".")+1)+newImageTypeString;
-                    File file1 = FileUtil.file(imagesPathInVM + newImageName);
+                    File file1 = FileUtil.file(imagesPathInWindows + newImageName);
                     ImgUtil.convert(file,file1);
                     boolean deleted = file.delete();
                     log.info("删除原图片："+deleted);

@@ -31,7 +31,7 @@ public class ImagesController {
      * @return Result      响应
      */
     @PostMapping("/uploadImages")
-    public Result uploadImages(@RequestHeader String Authorization, @RequestBody ArrayList<MultipartFile> images,@RequestBody ArrayList<String> newImageTypes) {
+    public Result uploadImages(@RequestHeader String Authorization, @RequestBody ArrayList<MultipartFile> images,@RequestParam ArrayList<String> newImageTypes) {
         Claims claims = JwtUtils.parseJWT(Authorization, signKey);
         if(images.isEmpty()){
             return Result.error("上传图片为空");
