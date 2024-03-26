@@ -13,12 +13,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,10 +42,12 @@ public class VideosServiceImpl extends ServiceImpl<VideosMapper, Video> implemen
 
     private final String videosPathInVM; //linux
     private final String videoShardingPathInVM; //linux
+//    private final String InWindows; //windows
 
     public VideosServiceImpl() {
         videosPathInVM = "/data/pet-hospital/videos/";
         videoShardingPathInVM = "/data/pet-hospital/videos/sharding/";
+//        InWindows = "D:/";
     }
 
     @Override
@@ -51,7 +55,7 @@ public class VideosServiceImpl extends ServiceImpl<VideosMapper, Video> implemen
         String shardingPath = videoShardingPathInVM + shardingMd5 + "_" + shardingInVideoIndex;
         File shardingFile = new File(shardingPath);
         videoSharding.transferTo(shardingFile);
-        Map<Object, Object> map = new HashMap<>();
+        Map<String, String> map = new HashMap<>();
         map.put("sharding_path_" + shardingInVideoIndex, shardingPath);//分片存储路径
         map.put("sharding_md5_" + shardingInVideoIndex, shardingMd5);
         map.put("video_sharding_num", allShardingNums);
@@ -61,11 +65,12 @@ public class VideosServiceImpl extends ServiceImpl<VideosMapper, Video> implemen
 
     @Override
     public Boolean checkOneVideoSharding(String videoMd5, String shardingInVideoIndex, String shardingMd5) {
-        Object o = cacheClient.getHashValue(videoMd5, "sharding_md5_" + shardingInVideoIndex);
+        String o = cacheClient.getHashValue(videoMd5, "sharding_md5_" + shardingInVideoIndex);
         return shardingMd5.equals(o);
     }
 
     @Override
+    @Transactional
     public Video mergeVideoSharding(String videoMd5, String videoOriginalName, Long uid) throws IOException {
         boolean flag = checkBeforeMerge(videoMd5);
         if (!flag) {
@@ -73,7 +78,7 @@ public class VideosServiceImpl extends ServiceImpl<VideosMapper, Video> implemen
         }
         //是否已经上传过
         List<Video> map = videosMapper.selectByMap(new HashMap<>() {{
-            put("videoMd5", videoMd5);
+            put("video_md5", videoMd5);
         }});
         String videoPath = null;
         if (!map.isEmpty()) {
@@ -109,7 +114,7 @@ public class VideosServiceImpl extends ServiceImpl<VideosMapper, Video> implemen
             }
         }
         //合并分片,按照分片的索引顺序进行合并
-        Integer videoShardingNum = (Integer) cacheClient.getHashValue(videoMd5, "video_sharding_num");
+        int videoShardingNum = Integer.parseInt(cacheClient.getHashValue(videoMd5, "video_sharding_num")) ;
         Long snowflakeNextId = IdUtil.getSnowflakeNextId();
         String newVideoName = snowflakeNextId + "_" + videoOriginalName;
         File videoFile = new File(videosPathInVM + newVideoName);
@@ -117,12 +122,13 @@ public class VideosServiceImpl extends ServiceImpl<VideosMapper, Video> implemen
         RandomAccessFile fileInputStream;
         fileOutputStream = new RandomAccessFile(videoFile, "rw");
         for (int i = 0; i < videoShardingNum; i++) {
-            String shardingPath = (String) cacheClient.getHashValue(videoMd5, "sharding_path_" + i);
+            String shardingPath = cacheClient.getHashValue(videoMd5, "sharding_path_" + i);
             File shardingFile = new File(shardingPath);
             fileInputStream = new RandomAccessFile(shardingFile, "r");
+            int len;
             byte[] bytes = new byte[1024 * 1024];
-            while (fileInputStream.read(bytes) != -1) {
-                fileOutputStream.write(bytes);
+            while ((len=fileInputStream.read(bytes)) != -1) {
+                fileOutputStream.write(bytes, 0, len);
             }
             fileInputStream.close();
         }
@@ -150,27 +156,29 @@ public class VideosServiceImpl extends ServiceImpl<VideosMapper, Video> implemen
     }
 
     private boolean checkBeforeMerge(String videoMd5) {
-        Map<Object, Object> map = cacheClient.getHashMap(videoMd5);
-        Object videoShardingNum = map.get("video_sharding_num");
+        Map<String, String> map = cacheClient.getHashMap(videoMd5);
+        String videoShardingNum = map.get("video_sharding_num");
         int i = 0;
-        for (Object hashKey : map.keySet()) {
-            if (hashKey.toString().startsWith("sharding_md5_")) {
+        for (String hashKey : map.keySet()) {
+            if (hashKey.startsWith("sharding_md5_")) {
                 ++i;
             }
         }
-        return Integer.parseInt(videoShardingNum.toString()) == (i);
+        return Integer.parseInt(videoShardingNum) == (i);
     }
 
     private void delTmpFile(String md5Value){
-        Map<Object, Object> map = cacheClient.getHashMap(md5Value);
-        for (Object hashKey : map.keySet()) {
-            if (hashKey.toString().startsWith("sharding_path_")) {
-                String filePath = map.get(hashKey).toString();
+        Map<String, String> map = cacheClient.getHashMap(md5Value);
+        ArrayList<String> list = new ArrayList<>();
+        for (String hashKey : map.keySet()) {
+            if (hashKey.startsWith("sharding_path_")) {
+                String filePath = map.get(hashKey);
                 File file = new File(filePath);
                 boolean flag = file.delete();
                 log.info("删除临时文件{}{}", filePath, flag ? "成功" : "失败");
             }
+            list.add(hashKey);
         }
-        cacheClient.deleteHashMap(md5Value);
+        cacheClient.deleteHashKeys(md5Value,list);
     }
 }
