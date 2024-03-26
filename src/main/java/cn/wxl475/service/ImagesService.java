@@ -19,5 +19,5 @@ public interface ImagesService extends IService<Image> {
 
     ArrayList<Image> searchImagesWithKeyword(String keyword,Integer pageNum,Integer pageSize,String sortField,Integer sortOrder);
 
-    Image searchImagesById(Long imageId);
+    ArrayList<Image> searchImagesByIds(ArrayList<Long> imageIds);
 }

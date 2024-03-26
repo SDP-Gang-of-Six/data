@@ -24,7 +24,7 @@ public class ImagesController {
     private ImagesService imagesService;
 
     /**
-     * 上传图片
+     * 图片-批量/单个-上传图片
      *
      * @param Authorization token
      * @param images       图片
@@ -40,7 +40,7 @@ public class ImagesController {
     }
 
     /**
-     * 删除图片
+     * 图片-批量/单个-删除图片
      *
      * @param Authorization token
      * @param imageIds       图片id
@@ -77,14 +77,14 @@ public class ImagesController {
     }
 
     /**
-     * 按图片id查询
+     * 图片-批量/单个-按图片id查询
      *
      * @param Authorization token
-     * @param imageId       图片id
+     * @param imageIds       图片ids
      * @return  Result      响应
      */
-    @PostMapping("/searchImageById")
-    public Result searchImagesById(@RequestHeader String Authorization,@RequestParam Long imageId) {
-        return Result.success(imagesService.searchImagesById(imageId));
+    @PostMapping("/searchImagesByIds")
+    public Result searchImagesByIds(@RequestHeader String Authorization,@RequestBody ArrayList<Long>  imageIds) {
+        return Result.success(imagesService.searchImagesByIds(imageIds));
     }
 }

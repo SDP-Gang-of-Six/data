@@ -151,12 +151,19 @@ public class ImagesServiceImpl extends ServiceImpl<ImagesMapper,Image> implement
     /**
      * 按图片id查询
      *
-     * @param imageId   图片id
+     * @param imageIds   图片id
      * @return Image    图片
      */
     @Override
     @DS("slave")
-    public Image searchImagesById(Long imageId) {
-        return cacheClient.queryWithPassThrough(CACHE_IMAGEDETAIL_KEY,LOCK_IMAGEDETAIL_KEY,imageId,Image.class,imagesMapper::selectById,CACHE_IMAGEDETAIL_TTL, TimeUnit.MINUTES);
+    public ArrayList<Image> searchImagesByIds(ArrayList<Long> imageIds) {
+        ArrayList<Image> images = new ArrayList<>();
+        imageIds.forEach(imageId->{
+            Image image = cacheClient.queryWithPassThrough(CACHE_IMAGEDETAIL_KEY,LOCK_IMAGEDETAIL_KEY,imageId,Image.class,imagesMapper::selectById,CACHE_IMAGEDETAIL_TTL, TimeUnit.MINUTES);
+            if(image!=null){
+                images.add(image);
+            }
+        });
+        return images;
     }
 }

@@ -3,15 +3,23 @@ package cn.wxl475.service.impl;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.URLUtil;
 import cn.wxl475.mapper.VideosMapper;
+import cn.wxl475.pojo.data.Image;
 import cn.wxl475.pojo.data.Video;
 import cn.wxl475.redis.CacheClient;
 import cn.wxl475.repo.VideoEsRepo;
 import cn.wxl475.service.VideosService;
+import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.sort.SortBuilders;
+import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
+import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,6 +32,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import static cn.wxl475.redis.RedisConstants.*;
+import static cn.wxl475.redis.RedisConstants.CACHE_IMAGEDETAIL_TTL;
 
 @Slf4j
 @Service
@@ -50,6 +62,16 @@ public class VideosServiceImpl extends ServiceImpl<VideosMapper, Video> implemen
 //        InWindows = "D:/";
     }
 
+    /**
+     * 视频-上传视频分片
+     * @param videoSharding
+     * @param videoMd5
+     * @param shardingMd5
+     * @param shardingInVideoIndex
+     * @param allShardingNums
+     * @return
+     * @throws IOException
+     */
     @Override
     public Boolean uploadOneVideoSharding(MultipartFile videoSharding, String videoMd5, String shardingMd5, String shardingInVideoIndex, String allShardingNums) throws IOException {
         String shardingPath = videoShardingPathInVM + shardingMd5 + "_" + shardingInVideoIndex;
@@ -63,12 +85,27 @@ public class VideosServiceImpl extends ServiceImpl<VideosMapper, Video> implemen
         return true;
     }
 
+    /**
+     * 视频-检查视频分片是否上传过
+     * @param videoMd5
+     * @param shardingInVideoIndex
+     * @param shardingMd5
+     * @return
+     */
     @Override
     public Boolean checkOneVideoSharding(String videoMd5, String shardingInVideoIndex, String shardingMd5) {
         String o = cacheClient.getHashValue(videoMd5, "sharding_md5_" + shardingInVideoIndex);
         return shardingMd5.equals(o);
     }
 
+    /**
+     * 视频-合并视频分片
+     * @param videoMd5
+     * @param videoOriginalName
+     * @param uid
+     * @return
+     * @throws IOException
+     */
     @Override
     @Transactional
     public Video mergeVideoSharding(String videoMd5, String videoOriginalName, Long uid) throws IOException {
@@ -155,12 +192,83 @@ public class VideosServiceImpl extends ServiceImpl<VideosMapper, Video> implemen
         return video;
     }
 
+    /**
+     * 视频-删除视频分片
+     * @param videoMd5
+     * @return
+     */
     @Override
     public Boolean deleteVideoSharding(String videoMd5) {
         delTmpFile(videoMd5);
         return true;
     }
 
+    /**
+     * 视频-批量/单个-删除视频
+     * @param videoIds
+     * @return
+     */
+    @Override
+    public Boolean deleteVideos(ArrayList<Long> videoIds) {
+        videosMapper.deleteBatchIds(videoIds);
+        videoEsRepo.deleteAllById(videoIds);
+        videoIds.forEach(videoId->{
+            cacheClient.delete(CACHE_VIDEODETAIL_KEY+videoId);
+        });
+        return true;
+    }
+
+    /**
+     * 视频-关键词分页查询视频
+     * @param keyword
+     * @param pageNum
+     * @param pageSize
+     * @param sortField
+     * @param sortOrder
+     * @return
+     */
+    @Override
+    public ArrayList<Video> searchVideosByKeyword(String keyword, Integer pageNum, Integer pageSize, String sortField, Integer sortOrder) {
+        ArrayList<Video> videos = new ArrayList<>();
+        NativeSearchQueryBuilder queryBuilder = new NativeSearchQueryBuilder().withPageable(PageRequest.of(pageNum-1, pageSize));
+        if(keyword!=null && !keyword.isEmpty()){
+            queryBuilder.withQuery(QueryBuilders.multiMatchQuery(keyword,"videoName","videoUrl","videoType","createTime","updateTime"));
+        }
+        if(sortField==null || sortField.isEmpty()){
+            sortField = "videoId";
+        }
+        if(sortOrder==null || !(sortOrder==1 || sortOrder==-1)){
+            sortOrder=-1;
+        }
+        queryBuilder.withSorts(SortBuilders.fieldSort(sortField).order(sortOrder==-1? SortOrder.DESC:SortOrder.ASC));
+        SearchHits<Video> hits = elasticsearchRestTemplate.search(queryBuilder.build(), Video.class);
+        hits.forEach(video -> videos.add(video.getContent()));
+        return videos;
+    }
+
+    /**
+     * 视频-批量/单个-按视频id查询
+     * @param videoIds
+     * @return
+     */
+    @Override
+    @DS("slave")
+    public ArrayList<Video> searchVideosByIds(ArrayList<Long> videoIds) {
+        ArrayList<Video> videos = new ArrayList<>();
+        videoIds.forEach(videoId->{
+            Video video = cacheClient.queryWithPassThrough(CACHE_VIDEODETAIL_KEY,LOCK_VIDEODETAIL_KEY,videoId,Video.class,videosMapper::selectById,CACHE_VIDEODETAIL_TTL, TimeUnit.MINUTES);
+            if(video!=null){
+                videos.add(video);
+            }
+        });
+        return videos;
+    }
+
+    /**
+     * 检查视频分片是否全部上传完毕
+     * @param videoMd5
+     * @return
+     */
     private boolean checkBeforeMerge(String videoMd5) {
         Map<String, String> map = cacheClient.getHashMap(videoMd5);
         String videoShardingNum = map.get("video_sharding_num");
@@ -173,6 +281,10 @@ public class VideosServiceImpl extends ServiceImpl<VideosMapper, Video> implemen
         return Integer.parseInt(videoShardingNum) == (i);
     }
 
+    /**
+     * 删除临时文件
+     * @param md5Value
+     */
     private void delTmpFile(String md5Value){
         Map<String, String> map = cacheClient.getHashMap(md5Value);
         ArrayList<String> list = new ArrayList<>();
