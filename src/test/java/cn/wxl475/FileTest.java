@@ -1,5 +1,7 @@
 package cn.wxl475;
 
+import cn.hutool.core.img.ImgUtil;
+import cn.hutool.core.io.FileUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 
@@ -7,7 +9,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 @Slf4j
-public class FileCuttingTest {
+public class FileTest {
 
     @Test
     public void fileCutting() throws IOException {
@@ -27,5 +29,9 @@ public class FileCuttingTest {
         output2.write(bytes2);
         output1.close();
         output2.close();
+    }
+    @Test
+    public void imageConvert(){
+        ImgUtil.convert(FileUtil.file("D:/学期资料/图集/新建文件夹/1 (2).jpg"), FileUtil.file("D:/学期资料/图集/新建文件夹/1 (2).png"));
     }
 }
