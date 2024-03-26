@@ -3,7 +3,6 @@ package cn.wxl475.service.impl;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.URLUtil;
 import cn.wxl475.mapper.VideosMapper;
-import cn.wxl475.pojo.data.Image;
 import cn.wxl475.pojo.data.Video;
 import cn.wxl475.redis.CacheClient;
 import cn.wxl475.repo.VideoEsRepo;
@@ -35,7 +34,6 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static cn.wxl475.redis.RedisConstants.*;
-import static cn.wxl475.redis.RedisConstants.CACHE_IMAGEDETAIL_TTL;
 
 @Slf4j
 @Service
@@ -212,9 +210,7 @@ public class VideosServiceImpl extends ServiceImpl<VideosMapper, Video> implemen
     public Boolean deleteVideos(ArrayList<Long> videoIds) {
         videosMapper.deleteBatchIds(videoIds);
         videoEsRepo.deleteAllById(videoIds);
-        videoIds.forEach(videoId->{
-            cacheClient.delete(CACHE_VIDEODETAIL_KEY+videoId);
-        });
+        videoIds.forEach(videoId-> cacheClient.delete(CACHE_VIDEODETAIL_KEY+videoId));
         return true;
     }
 

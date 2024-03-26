@@ -115,9 +115,7 @@ public class ImagesServiceImpl extends ServiceImpl<ImagesMapper,Image> implement
     public Boolean deleteImages(ArrayList<Long> imageIds) {
         imagesMapper.deleteBatchIds(imageIds);
         imagesEsRepo.deleteAllById(imageIds);
-        imageIds.forEach(imageId->{
-            cacheClient.delete(CACHE_IMAGEDETAIL_KEY+imageId);
-        });
+        imageIds.forEach(imageId-> cacheClient.delete(CACHE_IMAGEDETAIL_KEY+imageId));
         return true;
     }
 
