@@ -39,16 +39,16 @@ public class VideosServiceImpl extends ServiceImpl<VideosMapper, Video> implemen
     private String urlPrefix;
 
     private final String videosPathInVM; //linux
-    private final String videoShardingsPathInVM; //linux
+    private final String videoShardingPathInVM; //linux
 
     public VideosServiceImpl() {
         videosPathInVM = "/data/pet-hospital/videos/";
-        videoShardingsPathInVM = "/data/pet-hospital/videos/shardings/";
+        videoShardingPathInVM = "/data/pet-hospital/videos/sharding/";
     }
 
     @Override
     public Boolean uploadOneVideoSharding(MultipartFile videoSharding, String videoMd5, String shardingMd5, String shardingInVideoIndex, String allShardingNums) throws IOException {
-        String shardingPath = videoShardingsPathInVM + shardingMd5 + "_" + shardingInVideoIndex;
+        String shardingPath = videoShardingPathInVM + shardingMd5 + "_" + shardingInVideoIndex;
         File shardingFile = new File(shardingPath);
         videoSharding.transferTo(shardingFile);
         Map<Object, Object> map = new HashMap<>();
@@ -66,7 +66,7 @@ public class VideosServiceImpl extends ServiceImpl<VideosMapper, Video> implemen
     }
 
     @Override
-    public Video mergeVideoShardings(String videoMd5, String videoOriginalName, Long uid) throws IOException {
+    public Video mergeVideoSharding(String videoMd5, String videoOriginalName, Long uid) throws IOException {
         boolean flag = checkBeforeMerge(videoMd5);
         if (!flag) {
             return null;

@@ -43,14 +43,14 @@ public class VideosController {
         return Result.success(videosService.checkOneVideoSharding(videoMd5,shardingInVideoIndex,shardingMd5));
     }
 
-    @PostMapping("/mergeVideoShardings")
-    public Result mergeVideoShardings(@RequestHeader String Authorization,
-                                      @RequestParam String videoMd5,
-                                      @RequestParam String videoOriginalName){
+    @PostMapping("/mergeVideoSharding")
+    public Result mergeVideoSharding(@RequestHeader String Authorization,
+                                     @RequestParam String videoMd5,
+                                     @RequestParam String videoOriginalName){
         Claims claims = JwtUtils.parseJWT(Authorization,signKey);
         Video video = null;
         try {
-            video = videosService.mergeVideoShardings(
+            video = videosService.mergeVideoSharding(
                     videoMd5,
                     videoOriginalName,
                     Long.valueOf(claims.get("uid").toString()));
