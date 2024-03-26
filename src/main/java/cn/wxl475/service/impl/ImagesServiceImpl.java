@@ -8,6 +8,7 @@ import cn.wxl475.pojo.data.Image;
 import cn.wxl475.redis.CacheClient;
 import cn.wxl475.repo.ImagesEsRepo;
 import cn.wxl475.service.ImagesService;
+import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -154,6 +155,7 @@ public class ImagesServiceImpl extends ServiceImpl<ImagesMapper,Image> implement
      * @return Image    图片
      */
     @Override
+    @DS("slave")
     public Image searchImagesById(Long imageId) {
         return cacheClient.queryWithPassThrough(CACHE_IMAGEDETAIL_KEY,LOCK_IMAGEDETAIL_KEY,imageId,Image.class,imagesMapper::selectById,CACHE_IMAGEDETAIL_TTL, TimeUnit.MINUTES);
     }
