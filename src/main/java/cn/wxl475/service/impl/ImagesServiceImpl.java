@@ -49,7 +49,7 @@ public class ImagesServiceImpl extends ServiceImpl<ImagesMapper,Image> implement
     private String urlPrefix;
 
     private final String imagesPathInVM = "/data/pet-hospital/images/"; //linux
-    private final String imagesPathInWindows = "D:/"; //windows
+//    private final String imagesPathInWindows = "D:/"; //windows
 
 
     /**
