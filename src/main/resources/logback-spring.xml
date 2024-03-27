@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="false">
+    <springProperty scope="context" name="serverName" source="spring.application.name" defaultValue="unKnowServer" />
+
+    <property name="PATTERN"
+              value="%-12(%d{yyyy-MM-dd HH:mm:ss.SSS}) %-5level [${serverName}] [%thread] [%c]: %msg%n " />
+
+    <!-- 控制台输出 -->
+    <appender name="stdout"
+              class="ch.qos.logback.core.ConsoleAppender">
+        <encoder >
+            <pattern>${PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <appender name="logfile"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>/logs/${serverName}.%d{yyyy-MM-dd}.log</FileNamePattern>
+            <MaxHistory>2</MaxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="async" class="ch.qos.logback.classic.AsyncAppender">
+        <discardingThreshold>0</discardingThreshold>
+        <queueSize>512</queueSize>
+        <!-- 指定异步写入名称为 logfile 的 appender，这里最多只能添加一个 appender-ref -->
+        <appender-ref ref="logfile" />
+    </appender>
+
+    <root>
+        <level value="DEBUG"/><!-- TRACE、DEBUG、INFO、WARN和ERROR -->
+        <appender-ref ref="stdout"/>
+        <appender-ref ref="async" />
+    </root>
+</configuration>
