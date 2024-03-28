@@ -31,12 +31,18 @@ public class ImagesController {
      * @return Result      响应
      */
     @PostMapping("/uploadImages")
-    public Result uploadImages(@RequestHeader String Authorization, @RequestBody ArrayList<MultipartFile> images,@RequestParam ArrayList<String> newImageTypes) {
+    public Result uploadImages(@RequestHeader String Authorization,
+                               @RequestBody ArrayList<MultipartFile> images,
+                               @RequestParam ArrayList<String> newImageTypes,
+                               @RequestParam ArrayList<Integer> newImageTypesIndex) {
         Claims claims = JwtUtils.parseJWT(Authorization, signKey);
         if(images.isEmpty()){
             return Result.error("上传图片为空");
         }
-        return Result.success(imagesService.uploadImages(images,newImageTypes,Long.valueOf(claims.get("uid").toString())));
+        if(newImageTypes.isEmpty()){
+            return Result.success(imagesService.uploadImages(images,Long.valueOf(claims.get("uid").toString())));
+        }
+        return Result.success(imagesService.uploadImagesWithNewTypes(images,newImageTypes,newImageTypesIndex,Long.valueOf(claims.get("uid").toString())));
     }
 
     /**

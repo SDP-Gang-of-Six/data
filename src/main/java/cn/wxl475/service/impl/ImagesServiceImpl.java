@@ -65,44 +65,96 @@ public class ImagesServiceImpl extends ServiceImpl<ImagesMapper,Image> implement
      */
     @Override
     @Transactional
-    public ArrayList<Image> uploadImages(ArrayList<MultipartFile> images,ArrayList<String> newImageTypes, Long userId) {
+    public ArrayList<Image> uploadImagesWithNewTypes(ArrayList<MultipartFile> images,ArrayList<String> newImageTypes,
+                                         ArrayList<Integer> newImageTypesIndex, Long userId) {
         // 上传文件
         CompletionService<Image> completionService = ThreadUtil.newCompletionService();
         ArrayList<Future<Image>> futures = new ArrayList<>();
         for (int i=0;i<images.size();i++){
             MultipartFile image = images.get(i);
-            AtomicReference<String> newImageType = new AtomicReference<>(newImageTypes.get(i));
-            futures.add(completionService.submit(() -> {
-                Long snowflakeNextId = IdUtil.getSnowflakeNextId();
-                String newImageName = snowflakeNextId + "_" + image.getOriginalFilename();
-                String type = image.getContentType();
-                File file = new File(imagesPathInWindows + newImageName);
-                image.transferTo(file);
-                String newImageTypeString = newImageType.get();
-                if(newImageTypeString !=null && !newImageTypeString.isEmpty()){
-                    type= newImageTypeString;
-                    newImageName = snowflakeNextId + "_" + Objects.requireNonNull(image.getOriginalFilename()).substring(0,image.getOriginalFilename().lastIndexOf(".")+1)+newImageTypeString;
-                    File file1 = FileUtil.file(imagesPathInWindows + newImageName);
+            if(newImageTypesIndex.contains(i)){
+                AtomicReference<String> newImageType = new AtomicReference<>(newImageTypes.get(i));
+                futures.add(completionService.submit(() -> {
+                    Long snowflakeNextId = IdUtil.getSnowflakeNextId();
+                    String originalFilename = image.getOriginalFilename();
+                    String newImageName = snowflakeNextId + "_" + originalFilename;
+                    File file = new File(imagesPathInVM + newImageName);
+                    image.transferTo(file);
+                    String newImageTypeString = newImageType.get();
+                    newImageName = snowflakeNextId + "_" + Objects.requireNonNull(originalFilename).substring(0, originalFilename.lastIndexOf(".")+1)+newImageTypeString;
+                    File file1 = FileUtil.file(imagesPathInVM + newImageName);
                     ImgUtil.convert(file,file1);
                     boolean deleted = file.delete();
                     log.info("删除原图片："+deleted);
-                }
-                return new Image(
-                        snowflakeNextId,
-                        userId,
-                        URLUtil.normalize(
-                        urlPrefix +
-                            "images/" +
-                            newImageName
-                        ),
-                        newImageName.substring(newImageName.indexOf("_")+1),
-                        type,
-                        image.getSize(),
-                        null,
-                        null,
-                        false
-                );
-            }));
+                    return new Image(
+                            snowflakeNextId,
+                            userId,
+                            URLUtil.normalize(
+                                    urlPrefix +
+                                            "images/" +
+                                            newImageName
+                            ),
+                            newImageName.substring(newImageName.indexOf("_")+1),
+                            newImageTypeString,
+                            image.getSize(),
+                            null,
+                            null,
+                            false
+                    );
+                }));
+            }else {
+                uploadWithoutNewType(userId, completionService, futures, image, imagesPathInVM, urlPrefix);
+            }
+        }
+        ArrayList<Image> imageList = new ArrayList<>();
+        for (Future<Image> future : futures) {
+            Image image = new Image();
+            try {
+                image = future.get();
+            } catch (Exception e) {
+                imageList.add(image);
+                log.error("写文件线程结果获取失败，该线程索引："+futures.indexOf(future), e);
+                continue;
+            }
+            imagesMapper.insert(image);
+            imagesEsRepo.save(image);
+            imageList.add(image); //要在数据库操作后再加入列表，获取插入后返回的id和时间
+        }
+        return imageList;
+    }
+
+    private static void uploadWithoutNewType(Long userId, CompletionService<Image> completionService, ArrayList<Future<Image>> futures, MultipartFile image, String imagesPathInVM, String urlPrefix) {
+        futures.add(completionService.submit(() -> {
+            Long snowflakeNextId = IdUtil.getSnowflakeNextId();
+            String originalFilename = image.getOriginalFilename();
+            String newImageName = snowflakeNextId + "_" + originalFilename;
+            File file = new File(imagesPathInVM + newImageName);
+            image.transferTo(file);
+            return new Image(
+                    snowflakeNextId,
+                    userId,
+                    URLUtil.normalize(
+                            urlPrefix +
+                                    "images/" +
+                                    newImageName
+                    ),
+                    originalFilename,
+                    image.getContentType(),
+                    image.getSize(),
+                    null,
+                    null,
+                    false
+            );
+        }));
+    }
+
+    @Override
+    public ArrayList<Image> uploadImages(ArrayList<MultipartFile> images, Long userId) {
+        // 上传文件
+        CompletionService<Image> completionService = ThreadUtil.newCompletionService();
+        ArrayList<Future<Image>> futures = new ArrayList<>();
+        for (MultipartFile image : images) {
+            uploadWithoutNewType(userId, completionService, futures, image, imagesPathInVM, urlPrefix);
         }
         ArrayList<Image> imageList = new ArrayList<>();
         for (Future<Image> future : futures) {

@@ -13,7 +13,10 @@ public interface ImagesService extends IService<Image> {
      * @param userId
      * @return
      */
-    ArrayList<Image> uploadImages(ArrayList<MultipartFile> images,ArrayList<String> newImageTypes, Long userId);
+    ArrayList<Image> uploadImagesWithNewTypes(ArrayList<MultipartFile> images,ArrayList<String> newImageTypes,
+                                  ArrayList<Integer> newImageTypesIndex, Long userId);
+
+    ArrayList<Image> uploadImages(ArrayList<MultipartFile> images, Long userId);
 
     Boolean deleteImages(ArrayList<Long> imageIds);
 
