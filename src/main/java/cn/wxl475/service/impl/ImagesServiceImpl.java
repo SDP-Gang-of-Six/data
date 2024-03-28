@@ -52,8 +52,8 @@ public class ImagesServiceImpl extends ServiceImpl<ImagesMapper,Image> implement
     @Value("${fileServer.urlPrefix}")
     private String urlPrefix;
 
-    private final String imagesPathInVM = "/data/pet-hospital/images/"; //linux
-    private final String imagesPathInWindows = "D:/"; //windows
+    @Value("${fileServer.imagesPathInVM}")
+    private String imagesPathInVM; //linux
 
 
     /**

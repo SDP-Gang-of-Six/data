@@ -50,15 +50,10 @@ public class VideosServiceImpl extends ServiceImpl<VideosMapper, Video> implemen
     @Value("${fileServer.urlPrefix}")
     private String urlPrefix;
 
-    private final String videosPathInVM; //linux
-    private final String videoShardingPathInVM; //linux
-//    private final String InWindows; //windows
-
-    public VideosServiceImpl() {
-        videosPathInVM = "/data/pet-hospital/videos/";
-        videoShardingPathInVM = "/data/pet-hospital/videos/sharding/";
-//        InWindows = "D:/";
-    }
+    @Value("${fileServer.videosPathInVM}")
+    private String videosPathInVM; //linux
+    @Value("${fileServer.videoShardingPathInVM}")
+    private String videoShardingPathInVM; //linux
 
     /**
      * 视频-上传视频分片
