@@ -1,6 +1,5 @@
 package cn.wxl475;
 
-import cn.wxl475.pojo.base.Staff;
 import cn.wxl475.pojo.data.Image;
 import cn.wxl475.repo.ImagesEsRepo;
 import lombok.extern.slf4j.Slf4j;
