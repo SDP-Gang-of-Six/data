@@ -4,6 +4,7 @@ import cn.hutool.json.JSONUtil;
 import cn.wxl475.pojo.Result;
 import cn.wxl475.utils.JwtUtils;
 import io.jsonwebtoken.Claims;
+import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -18,7 +19,7 @@ public class AuthInterceptor implements HandlerInterceptor {
     private String signKey;
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    public boolean preHandle(HttpServletRequest request, @NonNull HttpServletResponse response,@NonNull Object handler) throws Exception {
         Claims claims = JwtUtils.parseJWT(request.getHeader("Authorization"), signKey);
         if (claims == null) {
             response.getWriter().write(JSONUtil.toJsonStr(Result.error("令牌无效")));
