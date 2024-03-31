@@ -1,5 +1,6 @@
 package cn.wxl475;
 
+import cn.wxl475.pojo.base.Staff;
 import cn.wxl475.pojo.data.Image;
 import cn.wxl475.repo.ImagesEsRepo;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +41,18 @@ public class ImagesEsTest {
             log.info("删除索引：{}",aClass.getName()+",成功");
         }else {
             log.info("删除索引：{}",aClass.getName()+",失败");
+        }
+    }
+
+    @Test
+    public void rebuildImagesIndex(){
+        Class<Image> aClass = Image.class;
+        boolean deleted = elasticsearchRestTemplate.indexOps(aClass).delete();
+        boolean created = elasticsearchRestTemplate.indexOps(aClass).createWithMapping();
+        if(deleted&&created){
+            log.info("重建索引：{}",aClass.getName()+",成功");
+        }else {
+            log.info("重建索引：{}",aClass.getName()+",失败");
         }
     }
 
