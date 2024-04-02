@@ -190,7 +190,7 @@ public class ImagesServiceImpl extends ServiceImpl<ImagesMapper,Image> implement
         try {
             imagesMapper.deleteBatchIds(imageIds);
             imagesEsRepo.deleteAllById(imageIds);
-            imageIds.forEach(imageId-> cacheClient.delete(CACHE_IMAGEDETAIL_KEY+imageId));
+            imageIds.forEach(imageId-> cacheClient.delete(CACHE_IMAGE_DETAIL_KEY +imageId));
         }catch (Exception e){
             log.info(Arrays.toString(e.getStackTrace()));
             throw new Exception(e);
@@ -235,7 +235,7 @@ public class ImagesServiceImpl extends ServiceImpl<ImagesMapper,Image> implement
     public ArrayList<Image> searchImagesByIds(ArrayList<Long> imageIds) {
         ArrayList<Image> images = new ArrayList<>();
         imageIds.forEach(imageId->{
-            Image image = cacheClient.queryWithPassThrough(CACHE_IMAGEDETAIL_KEY,LOCK_IMAGEDETAIL_KEY,imageId,Image.class,imagesMapper::selectById,CACHE_IMAGEDETAIL_TTL, TimeUnit.MINUTES);
+            Image image = cacheClient.queryWithPassThrough(CACHE_IMAGE_DETAIL_KEY, LOCK_IMAGE_DETAIL_KEY,imageId,Image.class,imagesMapper::selectById, CACHE_IMAGE_DETAIL_TTL, TimeUnit.MINUTES);
             if(image!=null){
                 images.add(image);
             }

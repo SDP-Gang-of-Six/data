@@ -214,7 +214,7 @@ public class VideosServiceImpl extends ServiceImpl<VideosMapper, Video> implemen
         try {
             videosMapper.deleteBatchIds(videoIds);
             videoEsRepo.deleteAllById(videoIds);
-            videoIds.forEach(videoId-> cacheClient.delete(CACHE_VIDEODETAIL_KEY+videoId));
+            videoIds.forEach(videoId-> cacheClient.delete(CACHE_VIDEO_DETAIL_KEY +videoId));
         }catch (Exception e) {
             throw new Exception(e);
         }
@@ -258,7 +258,7 @@ public class VideosServiceImpl extends ServiceImpl<VideosMapper, Video> implemen
     public ArrayList<Video> searchVideosByIds(ArrayList<Long> videoIds) {
         ArrayList<Video> videos = new ArrayList<>();
         videoIds.forEach(videoId->{
-            Video video = cacheClient.queryWithPassThrough(CACHE_VIDEODETAIL_KEY,LOCK_VIDEODETAIL_KEY,videoId,Video.class,videosMapper::selectById,CACHE_VIDEODETAIL_TTL, TimeUnit.MINUTES);
+            Video video = cacheClient.queryWithPassThrough(CACHE_VIDEO_DETAIL_KEY, LOCK_VIDEO_DETAIL_KEY,videoId,Video.class,videosMapper::selectById, CACHE_VIDEO_DETAIL_TTL, TimeUnit.MINUTES);
             if(video!=null){
                 videos.add(video);
             }
