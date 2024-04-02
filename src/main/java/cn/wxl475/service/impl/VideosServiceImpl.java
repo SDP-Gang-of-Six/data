@@ -27,10 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static cn.wxl475.redis.RedisConstants.*;
@@ -70,16 +67,20 @@ public class VideosServiceImpl extends ServiceImpl<VideosMapper, Video> implemen
      * @throws IOException
      */
     @Override
-    public Boolean uploadOneVideoSharding(MultipartFile videoSharding, String videoMd5, String shardingMd5, String shardingInVideoIndex, String allShardingNums) throws IOException {
-        String shardingPath = videoShardingPathInVM + shardingMd5 + "_" + shardingInVideoIndex;
-        File shardingFile = new File(shardingPath);
-        videoSharding.transferTo(shardingFile);
-        Map<String, String> map = new HashMap<>();
-        map.put("sharding_path_" + shardingInVideoIndex, shardingPath);//分片存储路径
-        map.put("sharding_md5_" + shardingInVideoIndex, shardingMd5);
-        map.put("video_sharding_num", allShardingNums);
-        cacheClient.setHashMap(videoMd5, map);
-        return true;
+    public void uploadOneVideoSharding(MultipartFile videoSharding, String videoMd5, String shardingMd5, String shardingInVideoIndex, String allShardingNums)throws Exception{
+        try {
+            String shardingPath = videoShardingPathInVM + shardingMd5 + "_" + shardingInVideoIndex;
+            File shardingFile = new File(shardingPath);
+            videoSharding.transferTo(shardingFile);
+            Map<String, String> map = new HashMap<>();
+            map.put("sharding_path_" + shardingInVideoIndex, shardingPath);//分片存储路径
+            map.put("sharding_md5_" + shardingInVideoIndex, shardingMd5);
+            map.put("video_sharding_num", allShardingNums);
+            cacheClient.setHashMap(videoMd5, map);
+        } catch (Exception e) {
+            log.info("上传视频分片失败：" + Arrays.toString(e.getStackTrace()));
+            throw new Exception(e);
+        }
     }
 
     /**
@@ -105,7 +106,7 @@ public class VideosServiceImpl extends ServiceImpl<VideosMapper, Video> implemen
      */
     @Override
     @Transactional
-    public Video mergeVideoSharding(String videoMd5, String videoOriginalName, Long uid) throws IOException {
+    public Video mergeVideoSharding(String videoMd5, String videoOriginalName, Long uid) throws Exception {
         boolean flag = checkBeforeMerge(videoMd5);
         if (!flag) {
             return null;
@@ -195,9 +196,12 @@ public class VideosServiceImpl extends ServiceImpl<VideosMapper, Video> implemen
      * @return
      */
     @Override
-    public Boolean deleteVideoSharding(String videoMd5) {
-        delTmpFile(videoMd5);
-        return true;
+    public void deleteVideoSharding(String videoMd5)throws Exception {
+        try {
+            delTmpFile(videoMd5);
+        }catch (Exception e) {
+            throw new Exception(e);
+        }
     }
 
     /**
@@ -206,11 +210,14 @@ public class VideosServiceImpl extends ServiceImpl<VideosMapper, Video> implemen
      * @return
      */
     @Override
-    public Boolean deleteVideos(ArrayList<Long> videoIds) {
-        videosMapper.deleteBatchIds(videoIds);
-        videoEsRepo.deleteAllById(videoIds);
-        videoIds.forEach(videoId-> cacheClient.delete(CACHE_VIDEODETAIL_KEY+videoId));
-        return true;
+    public void deleteVideos(ArrayList<Long> videoIds)throws Exception {
+        try {
+            videosMapper.deleteBatchIds(videoIds);
+            videoEsRepo.deleteAllById(videoIds);
+            videoIds.forEach(videoId-> cacheClient.delete(CACHE_VIDEODETAIL_KEY+videoId));
+        }catch (Exception e) {
+            throw new Exception(e);
+        }
     }
 
     /**

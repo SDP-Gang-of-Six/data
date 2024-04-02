@@ -1,19 +1,20 @@
 package cn.wxl475.controller;
 
-import cn.wxl475.exception.FileIOException;
 import cn.wxl475.pojo.Result;
 import cn.wxl475.pojo.data.Video;
 import cn.wxl475.service.VideosService;
 import cn.wxl475.utils.JwtUtils;
 import io.jsonwebtoken.Claims;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
+@Slf4j
 @RestController
 @RequestMapping("/data")
 public class VideosController {
@@ -45,10 +46,12 @@ public class VideosController {
                                          @RequestParam String shardingInVideoIndex,
                                          @RequestParam String allShardingNums){
         try {
-            return Result.success(videosService.uploadOneVideoSharding(videoSharding,videoMd5,shardingMd5,shardingInVideoIndex,allShardingNums));
-        } catch (IOException e) {
-            throw new FileIOException(e.getMessage());
+            videosService.uploadOneVideoSharding(videoSharding,videoMd5,shardingMd5,shardingInVideoIndex,allShardingNums);
+        } catch (Exception e) {
+            log.info(Arrays.toString(e.getStackTrace()));
+            return Result.error(e.getMessage());
         }
+        return Result.success(true);
     }
     /**
      * 视频-检查视频分片是否上传过
@@ -81,8 +84,9 @@ public class VideosController {
                     videoMd5,
                     videoOriginalName,
                     Long.valueOf(claims.get("uid").toString()));
-        } catch (IOException e) {
-            throw new FileIOException(e.getMessage());
+        } catch (Exception e) {
+            log.info(Arrays.toString(e.getStackTrace()));
+            return Result.error(e.getMessage());
         }
         if(video == null){
             return Result.error("视频分片尚未全部上传完毕");
@@ -97,7 +101,13 @@ public class VideosController {
      */
     @PostMapping("/deleteVideoSharding")
     public Result deleteVideoSharding(@RequestParam String videoMd5){
-        return Result.success(videosService.deleteVideoSharding(videoMd5));
+        try {
+            videosService.deleteVideoSharding(videoMd5);
+        } catch (Exception e) {
+            log.info(Arrays.toString(e.getStackTrace()));
+            return Result.error(e.getMessage());
+        }
+        return Result.success(true);
     }
 
     /**
@@ -107,7 +117,13 @@ public class VideosController {
      */
     @PostMapping("/deleteVideos")
     public Result deleteVideos(@RequestParam ArrayList<Long> videoIds){
-        return Result.success(videosService.deleteVideos(videoIds));
+        try {
+            videosService.deleteVideos(videoIds);
+        }catch (Exception e){
+            log.info(Arrays.toString(e.getStackTrace()));
+            return Result.error(e.getMessage());
+        }
+        return Result.success(true);
     }
 
     /**

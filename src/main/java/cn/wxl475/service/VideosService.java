@@ -3,19 +3,18 @@ package cn.wxl475.service;
 import cn.wxl475.pojo.data.Video;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 public interface VideosService {
-    Boolean uploadOneVideoSharding(MultipartFile videoSharding, String videoMd5, String shardingMd5, String shardingInVideoIndex, String allShardingNums) throws IOException;
+    void uploadOneVideoSharding(MultipartFile videoSharding, String videoMd5, String shardingMd5, String shardingInVideoIndex, String allShardingNums) throws Exception;
 
     Boolean checkOneVideoSharding(String videoMd5, String shardingInVideoIndex, String shardingMd5);
 
-    Video mergeVideoSharding(String videoMd5, String videoOriginalName, Long uid) throws IOException;
+    Video mergeVideoSharding(String videoMd5, String videoOriginalName, Long uid) throws Exception;
 
-    Boolean deleteVideoSharding(String videoMd5);
+    void deleteVideoSharding(String videoMd5) throws Exception;
 
-    Boolean deleteVideos(ArrayList<Long> videoIds);
+    void deleteVideos(ArrayList<Long> videoIds)throws Exception;
 
     ArrayList<Video> searchVideosByKeyword(String keyword, Integer pageNum, Integer pageSize, String sortField, Integer sortOrder);
 

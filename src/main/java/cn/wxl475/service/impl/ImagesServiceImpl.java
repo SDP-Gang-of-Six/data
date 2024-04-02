@@ -28,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.Future;
@@ -186,9 +187,14 @@ public class ImagesServiceImpl extends ServiceImpl<ImagesMapper,Image> implement
     @Override
     @Transactional
     public Boolean deleteImages(ArrayList<Long> imageIds) {
-        imagesMapper.deleteBatchIds(imageIds);
-        imagesEsRepo.deleteAllById(imageIds);
-        imageIds.forEach(imageId-> cacheClient.delete(CACHE_IMAGEDETAIL_KEY+imageId));
+        try {
+            imagesMapper.deleteBatchIds(imageIds);
+            imagesEsRepo.deleteAllById(imageIds);
+            imageIds.forEach(imageId-> cacheClient.delete(CACHE_IMAGEDETAIL_KEY+imageId));
+        }catch (RuntimeException e){
+            log.info(Arrays.toString(e.getStackTrace()));
+            return false;
+        }
         return true;
     }
 
