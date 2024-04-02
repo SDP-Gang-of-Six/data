@@ -186,16 +186,15 @@ public class ImagesServiceImpl extends ServiceImpl<ImagesMapper,Image> implement
      */
     @Override
     @Transactional
-    public Boolean deleteImages(ArrayList<Long> imageIds) {
+    public void deleteImages(ArrayList<Long> imageIds)throws Exception {
         try {
             imagesMapper.deleteBatchIds(imageIds);
             imagesEsRepo.deleteAllById(imageIds);
             imageIds.forEach(imageId-> cacheClient.delete(CACHE_IMAGEDETAIL_KEY+imageId));
-        }catch (RuntimeException e){
+        }catch (Exception e){
             log.info(Arrays.toString(e.getStackTrace()));
-            return false;
+            throw new Exception(e);
         }
-        return true;
     }
 
     /**

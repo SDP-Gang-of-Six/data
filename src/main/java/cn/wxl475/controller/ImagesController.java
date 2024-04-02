@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 @Slf4j
 @RestController
@@ -60,7 +61,13 @@ public class ImagesController {
         if(imageIds.isEmpty()){
             return Result.error("无图片需要删除");
         }
-        return Result.success(imagesService.deleteImages(imageIds));
+        try {
+            imagesService.deleteImages(imageIds);
+        } catch (Exception e) {
+            log.info(Arrays.toString(e.getStackTrace()));
+            return Result.error(e.getMessage());
+        }
+        return Result.success();
     }
 
     /**

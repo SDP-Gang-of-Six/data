@@ -18,7 +18,7 @@ public interface ImagesService extends IService<Image> {
 
     ArrayList<Image> uploadImages(ArrayList<MultipartFile> images, Long userId);
 
-    Boolean deleteImages(ArrayList<Long> imageIds);
+    void deleteImages(ArrayList<Long> imageIds) throws Exception;
 
     ArrayList<Image> searchImagesWithKeyword(String keyword,Integer pageNum,Integer pageSize,String sortField,Integer sortOrder);
 
