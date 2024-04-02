@@ -38,22 +38,26 @@ import static cn.wxl475.redis.RedisConstants.*;
 @Slf4j
 @Service
 public class VideosServiceImpl extends ServiceImpl<VideosMapper, Video> implements VideosService {
-    @Autowired
-    private VideosMapper videosMapper;
-    @Autowired
-    private VideoEsRepo videoEsRepo;
-    @Autowired
-    private CacheClient cacheClient;
-    @Autowired
-    private ElasticsearchRestTemplate elasticsearchRestTemplate;
+
+    private final VideosMapper videosMapper;
+    private final VideoEsRepo videoEsRepo;
+    private final CacheClient cacheClient;
+    private final ElasticsearchRestTemplate elasticsearchRestTemplate;
 
     @Value("${fileServer.urlPrefix}")
     private String urlPrefix;
-
     @Value("${fileServer.videosPathInVM}")
     private String videosPathInVM; //linux
     @Value("${fileServer.videoShardingPathInVM}")
     private String videoShardingPathInVM; //linux
+
+    @Autowired
+    public VideosServiceImpl(VideosMapper videosMapper, VideoEsRepo videoEsRepo, CacheClient cacheClient, ElasticsearchRestTemplate elasticsearchRestTemplate) {
+        this.videosMapper = videosMapper;
+        this.videoEsRepo = videoEsRepo;
+        this.cacheClient = cacheClient;
+        this.elasticsearchRestTemplate = elasticsearchRestTemplate;
+    }
 
     /**
      * 视频-上传视频分片

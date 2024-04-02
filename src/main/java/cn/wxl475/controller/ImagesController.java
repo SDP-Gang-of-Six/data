@@ -20,8 +20,12 @@ public class ImagesController {
     @Value("${jwt.signKey}")
     private String signKey;
 
+    private final ImagesService imagesService;
+
     @Autowired
-    private ImagesService imagesService;
+    public ImagesController(ImagesService imagesService) {
+        this.imagesService = imagesService;
+    }
 
     /**
      * 图片-批量/单个-上传图片

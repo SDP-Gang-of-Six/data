@@ -40,20 +40,24 @@ import static cn.wxl475.redis.RedisConstants.*;
 @Service
 public class ImagesServiceImpl extends ServiceImpl<ImagesMapper,Image> implements ImagesService {
 
-    @Autowired
-    private ImagesMapper imagesMapper;
-    @Autowired
-    private ImagesEsRepo imagesEsRepo;
-    @Autowired
-    private CacheClient cacheClient;
-    @Autowired
-    private ElasticsearchRestTemplate elasticsearchRestTemplate;
+
+    private final ImagesMapper imagesMapper;
+    private final ImagesEsRepo imagesEsRepo;
+    private final CacheClient cacheClient;
+    private final ElasticsearchRestTemplate elasticsearchRestTemplate;
 
     @Value("${fileServer.urlPrefix}")
     private String urlPrefix;
-
     @Value("${fileServer.imagesPathInVM}")
     private String imagesPathInVM; //linux
+
+    @Autowired
+    public ImagesServiceImpl(ImagesMapper imagesMapper, ImagesEsRepo imagesEsRepo, CacheClient cacheClient, ElasticsearchRestTemplate elasticsearchRestTemplate) {
+        this.imagesMapper = imagesMapper;
+        this.imagesEsRepo = imagesEsRepo;
+        this.cacheClient = cacheClient;
+        this.elasticsearchRestTemplate = elasticsearchRestTemplate;
+    }
 
 
     /**

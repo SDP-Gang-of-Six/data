@@ -21,8 +21,12 @@ public class VideosController {
     @Value("${jwt.signKey}")
     private String signKey;
 
+    private final VideosService videosService;
+
     @Autowired
-    private VideosService videosService;
+    public VideosController(VideosService videosService) {
+        this.videosService = videosService;
+    }
 
     /**
      * 视频-上传视频分片
