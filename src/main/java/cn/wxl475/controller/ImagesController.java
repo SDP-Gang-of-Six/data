@@ -52,12 +52,11 @@ public class ImagesController {
     /**
      * 图片-批量/单个-删除图片
      *
-     * @param Authorization token
      * @param imageIds       图片id
      * @return  Result      响应
      */
     @PostMapping("/deleteImages")
-    public Result deleteImages(@RequestHeader String Authorization, @RequestBody ArrayList<Long> imageIds) {
+    public Result deleteImages(@RequestBody ArrayList<Long> imageIds) {
         if(imageIds.isEmpty()){
             return Result.error("无图片需要删除");
         }
@@ -67,15 +66,13 @@ public class ImagesController {
     /**
      * 关键词分页查询图片
      *
-     * @param Authorization token
      * @param keyword       图片id
      * @param pageNum      页码
      * @param pageSize     页大小
      * @return  Result      响应
      */
     @PostMapping("/searchImagesByKeyword")
-    public Result searchImagesByKeyword(@RequestHeader String Authorization,
-                                        @RequestParam(required = false) String keyword,
+    public Result searchImagesByKeyword(@RequestParam(required = false) String keyword,
                                         @RequestParam Integer pageNum,
                                         @RequestParam Integer pageSize,
                                         @RequestParam(required = false) String sortField,
@@ -89,12 +86,11 @@ public class ImagesController {
     /**
      * 图片-批量/单个-按图片id查询
      *
-     * @param Authorization token
      * @param imageIds       图片ids
      * @return  Result      响应
      */
     @PostMapping("/searchImagesByIds")
-    public Result searchImagesByIds(@RequestHeader String Authorization,@RequestBody ArrayList<Long>  imageIds) {
+    public Result searchImagesByIds(@RequestBody ArrayList<Long>  imageIds) {
         return Result.success(imagesService.searchImagesByIds(imageIds));
     }
 }

@@ -30,7 +30,6 @@ public class VideosController {
 
     /**
      * 视频-上传视频分片
-     * @param Authorization
      * @param videoSharding
      * @param videoMd5
      * @param shardingMd5
@@ -39,8 +38,8 @@ public class VideosController {
      * @return
      */
     @PostMapping("/uploadOneVideoSharding")
-    public Result uploadOneVideoSharding(@RequestHeader String Authorization,
-                                         @RequestBody MultipartFile videoSharding,
+    public Result uploadOneVideoSharding(
+            @RequestBody MultipartFile videoSharding,
                                          @RequestParam String videoMd5,
                                          @RequestParam String shardingMd5,
                                          @RequestParam String shardingInVideoIndex,
@@ -53,15 +52,13 @@ public class VideosController {
     }
     /**
      * 视频-检查视频分片是否上传过
-     * @param Authorization
      * @param videoMd5
      * @param shardingInVideoIndex
      * @param shardingMd5
      * @return
      */
     @PostMapping("/checkOneVideoSharding")
-    public Result checkOneVideoSharding(@RequestHeader String Authorization,
-                                   @RequestParam String videoMd5,
+    public Result checkOneVideoSharding(@RequestParam String videoMd5,
                                    @RequestParam String shardingInVideoIndex,
                                    @RequestParam String shardingMd5){
         return Result.success(videosService.checkOneVideoSharding(videoMd5,shardingInVideoIndex,shardingMd5));
@@ -95,31 +92,26 @@ public class VideosController {
 
     /**
      * 视频-删除视频分片
-     * @param Authorization
      * @param videoMd5
      * @return
      */
     @PostMapping("/deleteVideoSharding")
-    public Result deleteVideoSharding(@RequestHeader String Authorization,
-                                      @RequestParam String videoMd5){
+    public Result deleteVideoSharding(@RequestParam String videoMd5){
         return Result.success(videosService.deleteVideoSharding(videoMd5));
     }
 
     /**
      * 视频-批量/单个-删除视频
-     * @param Authorization
      * @param videoIds
      * @return
      */
     @PostMapping("/deleteVideos")
-    public Result deleteVideos(@RequestHeader String Authorization,
-                               @RequestParam ArrayList<Long> videoIds){
+    public Result deleteVideos(@RequestParam ArrayList<Long> videoIds){
         return Result.success(videosService.deleteVideos(videoIds));
     }
 
     /**
      * 视频-关键词分页查询视频
-     * @param Authorization
      * @param keyword
      * @param pageNum
      * @param pageSize
@@ -128,8 +120,7 @@ public class VideosController {
      * @return
      */
     @PostMapping("/searchVideosByKeyword")
-    public Result searchVideosByKeyword(@RequestHeader String Authorization,
-                                        @RequestParam(required = false) String keyword,
+    public Result searchVideosByKeyword(@RequestParam(required = false) String keyword,
                                         @RequestParam Integer pageNum,
                                         @RequestParam Integer pageSize,
                                         @RequestParam(required = false) String sortField,
@@ -142,12 +133,11 @@ public class VideosController {
 
     /**
      * 视频-批量/单个-按视频id查询
-     * @param Authorization
      * @param videoIds
      * @return
      */
     @PostMapping("/searchVideosByIds")
-    public Result searchVideosByIds(@RequestHeader String Authorization,@RequestBody ArrayList<Long>  videoIds) {
+    public Result searchVideosByIds(@RequestBody ArrayList<Long>  videoIds) {
         return Result.success(videosService.searchVideosByIds(videoIds));
     }
 }
