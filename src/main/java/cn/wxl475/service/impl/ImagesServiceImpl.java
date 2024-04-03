@@ -210,7 +210,7 @@ public class ImagesServiceImpl extends ServiceImpl<ImagesMapper,Image> implement
         ArrayList<Image> images = new ArrayList<>();
         NativeSearchQueryBuilder queryBuilder = new NativeSearchQueryBuilder().withPageable(PageRequest.of(pageNum-1, pageSize));
         if(keyword!=null && !keyword.isEmpty()){
-            queryBuilder.withQuery(QueryBuilders.multiMatchQuery(keyword,"imageName","imageUrl","imageType","createTime","updateTime"));
+            queryBuilder.withQuery(QueryBuilders.multiMatchQuery(keyword,"imageName","imageUrl","imageType"));
         }
         if(sortField==null || sortField.isEmpty()){
             sortField = "imageId";

@@ -234,7 +234,7 @@ public class VideosServiceImpl extends ServiceImpl<VideosMapper, Video> implemen
         ArrayList<Video> videos = new ArrayList<>();
         NativeSearchQueryBuilder queryBuilder = new NativeSearchQueryBuilder().withPageable(PageRequest.of(pageNum-1, pageSize));
         if(keyword!=null && !keyword.isEmpty()){
-            queryBuilder.withQuery(QueryBuilders.multiMatchQuery(keyword,"videoName","videoUrl","videoType","createTime","updateTime"));
+            queryBuilder.withQuery(QueryBuilders.multiMatchQuery(keyword,"videoName","videoUrl","videoType"));
         }
         if(sortField==null || sortField.isEmpty()){
             sortField = "videoId";
