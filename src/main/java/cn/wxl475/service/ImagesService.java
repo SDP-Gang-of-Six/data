@@ -1,5 +1,6 @@
 package cn.wxl475.service;
 
+import cn.wxl475.pojo.Page;
 import cn.wxl475.pojo.data.Image;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,7 +21,7 @@ public interface ImagesService extends IService<Image> {
 
     void deleteImages(ArrayList<Long> imageIds) throws Exception;
 
-    ArrayList<Image> searchImagesWithKeyword(String keyword,Integer pageNum,Integer pageSize,String sortField,Integer sortOrder);
+    Page<Image> searchImagesWithKeyword(String keyword, Integer pageNum, Integer pageSize, String sortField, Integer sortOrder);
 
     ArrayList<Image> searchImagesByIds(ArrayList<Long> imageIds);
 }

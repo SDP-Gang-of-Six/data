@@ -1,5 +1,6 @@
 package cn.wxl475.service;
 
+import cn.wxl475.pojo.Page;
 import cn.wxl475.pojo.data.Video;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -16,7 +17,7 @@ public interface VideosService {
 
     void deleteVideos(ArrayList<Long> videoIds)throws Exception;
 
-    ArrayList<Video> searchVideosByKeyword(String keyword, Integer pageNum, Integer pageSize, String sortField, Integer sortOrder);
+    Page<Video> searchVideosByKeyword(String keyword, Integer pageNum, Integer pageSize, String sortField, Integer sortOrder);
 
     ArrayList<Video> searchVideosByIds(ArrayList<Long> videoIds);
 }

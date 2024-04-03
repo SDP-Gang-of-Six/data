@@ -3,6 +3,7 @@ package cn.wxl475.service.impl;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.URLUtil;
 import cn.wxl475.mapper.VideosMapper;
+import cn.wxl475.pojo.Page;
 import cn.wxl475.pojo.data.Video;
 import cn.wxl475.redis.CacheClient;
 import cn.wxl475.repo.VideoEsRepo;
@@ -230,8 +231,8 @@ public class VideosServiceImpl extends ServiceImpl<VideosMapper, Video> implemen
      * @return
      */
     @Override
-    public ArrayList<Video> searchVideosByKeyword(String keyword, Integer pageNum, Integer pageSize, String sortField, Integer sortOrder) {
-        ArrayList<Video> videos = new ArrayList<>();
+    public Page<Video> searchVideosByKeyword(String keyword, Integer pageNum, Integer pageSize, String sortField, Integer sortOrder) {
+        Page<Video> videos = new Page<>();
         NativeSearchQueryBuilder queryBuilder = new NativeSearchQueryBuilder().withPageable(PageRequest.of(pageNum-1, pageSize));
         if(keyword!=null && !keyword.isEmpty()){
             queryBuilder.withQuery(QueryBuilders.multiMatchQuery(keyword,"videoName","videoUrl","videoType"));
@@ -244,7 +245,8 @@ public class VideosServiceImpl extends ServiceImpl<VideosMapper, Video> implemen
         }
         queryBuilder.withSorts(SortBuilders.fieldSort(sortField).order(sortOrder==-1? SortOrder.DESC:SortOrder.ASC));
         SearchHits<Video> hits = elasticsearchRestTemplate.search(queryBuilder.build(), Video.class);
-        hits.forEach(video -> videos.add(video.getContent()));
+        hits.forEach(video -> videos.getData().add(video.getContent()));
+        videos.setTotalNumber(hits.getTotalHits());
         return videos;
     }
 

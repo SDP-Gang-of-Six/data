@@ -6,6 +6,7 @@ import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.URLUtil;
 import cn.wxl475.mapper.ImagesMapper;
+import cn.wxl475.pojo.Page;
 import cn.wxl475.pojo.data.Image;
 import cn.wxl475.redis.CacheClient;
 import cn.wxl475.repo.ImagesEsRepo;
@@ -206,8 +207,8 @@ public class ImagesServiceImpl extends ServiceImpl<ImagesMapper,Image> implement
      * @return ArrayList<Image> 图片列表
      */
     @Override
-    public ArrayList<Image> searchImagesWithKeyword(String keyword, Integer pageNum, Integer pageSize, String sortField, Integer sortOrder) {
-        ArrayList<Image> images = new ArrayList<>();
+    public Page<Image> searchImagesWithKeyword(String keyword, Integer pageNum, Integer pageSize, String sortField, Integer sortOrder) {
+        Page<Image> images = new Page<>();
         NativeSearchQueryBuilder queryBuilder = new NativeSearchQueryBuilder().withPageable(PageRequest.of(pageNum-1, pageSize));
         if(keyword!=null && !keyword.isEmpty()){
             queryBuilder.withQuery(QueryBuilders.multiMatchQuery(keyword,"imageName","imageUrl","imageType"));
@@ -220,7 +221,8 @@ public class ImagesServiceImpl extends ServiceImpl<ImagesMapper,Image> implement
         }
         queryBuilder.withSorts(SortBuilders.fieldSort(sortField).order(sortOrder==-1?SortOrder.DESC:SortOrder.ASC));
         SearchHits<Image> hits = elasticsearchRestTemplate.search(queryBuilder.build(), Image.class);
-        hits.forEach(image -> images.add(image.getContent()));
+        hits.forEach(image -> images.getData().add(image.getContent()));
+        images.setTotalNumber(hits.getTotalHits());
         return images;
     }
 
