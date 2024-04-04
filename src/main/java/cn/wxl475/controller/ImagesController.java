@@ -4,6 +4,7 @@ import cn.wxl475.pojo.Result;
 import cn.wxl475.service.ImagesService;
 import cn.wxl475.utils.JwtUtils;
 import io.jsonwebtoken.Claims;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,7 +33,7 @@ public class ImagesController {
      * 图片-批量/单个-上传图片
      *
      * @param Authorization token
-     * @param images       图片
+     * @param images        图片
      * @return Result      响应
      */
     @PostMapping("/uploadImages")
@@ -41,24 +42,24 @@ public class ImagesController {
                                @RequestParam ArrayList<String> newImageTypes,
                                @RequestParam ArrayList<Integer> newImageTypesIndex) {
         Claims claims = JwtUtils.parseJWT(Authorization, signKey);
-        if(images.isEmpty()){
+        if (images == null || images.isEmpty()) {
             return Result.error("上传图片为空");
         }
-        if(newImageTypes.isEmpty()){
-            return Result.success(imagesService.uploadImages(images,Long.valueOf(claims.get("uid").toString())));
+        if (newImageTypes.isEmpty()) {
+            return Result.success(imagesService.uploadImages(images, Long.valueOf(claims.get("uid").toString())));
         }
-        return Result.success(imagesService.uploadImagesWithNewTypes(images,newImageTypes,newImageTypesIndex,Long.valueOf(claims.get("uid").toString())));
+        return Result.success(imagesService.uploadImagesWithNewTypes(images, newImageTypes, newImageTypesIndex, Long.valueOf(claims.get("uid").toString())));
     }
 
     /**
      * 图片-批量/单个-删除图片
      *
-     * @param imageIds       图片id
-     * @return  Result      响应
+     * @param imageIds 图片id
+     * @return Result      响应
      */
     @PostMapping("/deleteImages")
     public Result deleteImages(@RequestBody ArrayList<Long> imageIds) {
-        if(imageIds.isEmpty()){
+        if (imageIds == null ||imageIds.isEmpty()) {
             return Result.error("无图片需要删除");
         }
         try {
@@ -73,31 +74,31 @@ public class ImagesController {
     /**
      * 关键词分页查询图片
      *
-     * @param keyword       图片id
-     * @param pageNum      页码
-     * @param pageSize     页大小
-     * @return  Result      响应
+     * @param keyword  图片id
+     * @param pageNum  页码
+     * @param pageSize 页大小
+     * @return Result      响应
      */
     @PostMapping("/searchImagesByKeyword")
     public Result searchImagesByKeyword(@RequestParam(required = false) String keyword,
                                         @RequestParam Integer pageNum,
                                         @RequestParam Integer pageSize,
                                         @RequestParam(required = false) String sortField,
-                                        @RequestParam(required = false) Integer sortOrder){
-        if(pageNum<=0||pageSize<=0){
+                                        @RequestParam(required = false) Integer sortOrder) {
+        if (pageNum <= 0 || pageSize <= 0) {
             return Result.error("页码或页大小不合法");
         }
-        return Result.success(imagesService.searchImagesWithKeyword(keyword,pageNum,pageSize,sortField,sortOrder));
+        return Result.success(imagesService.searchImagesWithKeyword(keyword, pageNum, pageSize, sortField, sortOrder));
     }
 
     /**
      * 图片-批量/单个-按图片id查询
      *
-     * @param imageIds       图片ids
-     * @return  Result      响应
+     * @param imageIds 图片ids
+     * @return Result      响应
      */
     @PostMapping("/searchImagesByIds")
-    public Result searchImagesByIds(@RequestBody ArrayList<Long>  imageIds) {
+    public Result searchImagesByIds(@RequestBody ArrayList<Long> imageIds) {
         return Result.success(imagesService.searchImagesByIds(imageIds));
     }
 }

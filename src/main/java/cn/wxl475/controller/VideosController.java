@@ -117,6 +117,9 @@ public class VideosController {
      */
     @PostMapping("/deleteVideos")
     public Result deleteVideos(@RequestParam ArrayList<Long> videoIds){
+        if (videoIds == null ||videoIds.isEmpty()) {
+            return Result.error("无视频需要删除");
+        }
         try {
             videosService.deleteVideos(videoIds);
         }catch (Exception e){
