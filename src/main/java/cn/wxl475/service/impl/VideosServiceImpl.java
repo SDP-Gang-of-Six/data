@@ -4,6 +4,7 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.URLUtil;
 import cn.wxl475.mapper.VideosMapper;
 import cn.wxl475.pojo.Page;
+import cn.wxl475.pojo.data.Image;
 import cn.wxl475.pojo.data.Video;
 import cn.wxl475.redis.CacheClient;
 import cn.wxl475.repo.VideoEsRepo;
@@ -232,7 +233,7 @@ public class VideosServiceImpl extends ServiceImpl<VideosMapper, Video> implemen
      */
     @Override
     public Page<Video> searchVideosByKeyword(String keyword, Integer pageNum, Integer pageSize, String sortField, Integer sortOrder) {
-        Page<Video> videos = new Page<>();
+        Page<Video> videos = new Page<>(0L,new ArrayList<>());
         NativeSearchQueryBuilder queryBuilder = new NativeSearchQueryBuilder().withPageable(PageRequest.of(pageNum-1, pageSize));
         if(keyword!=null && !keyword.isEmpty()){
             queryBuilder.withQuery(QueryBuilders.multiMatchQuery(keyword,"videoName","videoUrl","videoType"));

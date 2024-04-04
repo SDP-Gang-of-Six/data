@@ -208,7 +208,7 @@ public class ImagesServiceImpl extends ServiceImpl<ImagesMapper,Image> implement
      */
     @Override
     public Page<Image> searchImagesWithKeyword(String keyword, Integer pageNum, Integer pageSize, String sortField, Integer sortOrder) {
-        Page<Image> images = new Page<>();
+        Page<Image> images = new Page<>(0L,new ArrayList<>());
         NativeSearchQueryBuilder queryBuilder = new NativeSearchQueryBuilder().withPageable(PageRequest.of(pageNum-1, pageSize));
         if(keyword!=null && !keyword.isEmpty()){
             queryBuilder.withQuery(QueryBuilders.multiMatchQuery(keyword,"imageName","imageUrl","imageType"));
