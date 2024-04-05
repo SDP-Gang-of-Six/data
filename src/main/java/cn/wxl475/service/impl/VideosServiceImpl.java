@@ -142,8 +142,7 @@ public class VideosServiceImpl extends ServiceImpl<VideosMapper, Video> implemen
                         videoOriginalName.substring(videoOriginalName.lastIndexOf(".") + 1),
                         file.length(),
                         null,
-                        null,
-                        false
+                        null
                 );
                 videosMapper.insert(video);
                 videoEsRepo.save(video);
@@ -183,8 +182,7 @@ public class VideosServiceImpl extends ServiceImpl<VideosMapper, Video> implemen
                 videoOriginalName.substring(videoOriginalName.lastIndexOf(".") + 1),
                 videoFile.length(),
                 null,
-                null,
-                false
+                null
         );
         videosMapper.insert(video);
         videoEsRepo.save(video);

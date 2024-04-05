@@ -104,8 +104,7 @@ public class ImagesServiceImpl extends ServiceImpl<ImagesMapper,Image> implement
                             "image/"+newImageTypeString,
                             image.getSize(),
                             null,
-                            null,
-                            false
+                            null
                     );
                 }));
             }else {
@@ -148,8 +147,7 @@ public class ImagesServiceImpl extends ServiceImpl<ImagesMapper,Image> implement
                     image.getContentType(),
                     image.getSize(),
                     null,
-                    null,
-                    false
+                    null
             );
         }));
     }
