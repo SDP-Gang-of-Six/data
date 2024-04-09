@@ -45,7 +45,7 @@ public class ImagesController {
         if (images == null || images.isEmpty()) {
             return Result.error("上传图片为空");
         }
-        if (newImageTypes.isEmpty()) {
+        if (newImageTypes ==null || newImageTypes.isEmpty()) {
             return Result.success(imagesService.uploadImages(images, Long.valueOf(claims.get("uid").toString())));
         }
         return Result.success(imagesService.uploadImagesWithNewTypes(images, newImageTypes, newImageTypesIndex, Long.valueOf(claims.get("uid").toString())));
