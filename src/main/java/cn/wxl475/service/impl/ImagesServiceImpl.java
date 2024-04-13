@@ -78,7 +78,7 @@ public class ImagesServiceImpl extends ServiceImpl<ImagesMapper,Image> implement
         ArrayList<Future<Image>> futures = new ArrayList<>();
         for (int i=0;i<images.size();i++){
             MultipartFile image = images.get(i);
-            if(newImageTypesIndex.contains(i)){
+            if(newImageTypesIndex.contains(i)&& !Objects.requireNonNull(image.getContentType()).contains(newImageTypes.get(newImageTypesIndex.indexOf(i)))){
                 AtomicReference<String> newImageType = new AtomicReference<>(newImageTypes.get(newImageTypesIndex.indexOf(i)));
                 futures.add(completionService.submit(() -> {
                     Long snowflakeNextId = IdUtil.getSnowflakeNextId();
