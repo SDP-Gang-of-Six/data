@@ -1,12 +1,14 @@
 package cn.wxl475.service;
 
 import cn.wxl475.pojo.Page;
+import cn.wxl475.pojo.data.Image;
 import cn.wxl475.pojo.data.Video;
+import com.baomidou.mybatisplus.extension.service.IService;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 
-public interface VideosService {
+public interface VideosService extends IService<Video> {
     void uploadOneVideoSharding(MultipartFile videoSharding, String videoMd5, String shardingMd5, String shardingInVideoIndex, String allShardingNums) throws Exception;
 
     Boolean checkOneVideoSharding(String videoMd5, String shardingInVideoIndex, String shardingMd5);

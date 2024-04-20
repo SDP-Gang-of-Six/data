@@ -2,6 +2,7 @@ package cn.wxl475;
 
 import cn.wxl475.pojo.data.Image;
 import cn.wxl475.repo.ImagesEsRepo;
+import cn.wxl475.service.ImagesService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -9,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.List;
 
 @Slf4j
 @SpringBootTest(args = "--spring.profiles.active=dev")
@@ -20,6 +23,9 @@ public class ImagesEsTest {
 
     @Autowired
     private ImagesEsRepo imagesEsRepo;
+
+    @Autowired
+    private ImagesService imagesService;
 
     @Test
     public void creatImagesIndex(){
@@ -48,6 +54,8 @@ public class ImagesEsTest {
         Class<Image> aClass = Image.class;
         boolean deleted = elasticsearchRestTemplate.indexOps(aClass).delete();
         boolean created = elasticsearchRestTemplate.indexOps(aClass).createWithMapping();
+        List<Image> list = imagesService.list();
+        imagesEsRepo.saveAll(list);
         if(deleted&&created){
             log.info("重建索引：{}",aClass.getName()+",成功");
         }else {
